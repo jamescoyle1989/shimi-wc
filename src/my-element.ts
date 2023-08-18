@@ -97,7 +97,7 @@ export class MyElement extends LitElement {
       font-size: 1em;
       font-weight: 500;
       font-family: inherit;
-      background-color: #1a1a1a;
+      background-color: #ff0000;
       cursor: pointer;
       transition: border-color 0.25s;
     }
