@@ -2,11 +2,19 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { MidiOut, MidiAccess } from 'shimi';
 
-@customElement('midi-out-picker')
-export class MidiOutPicker extends LitElement {
+@customElement('out-port-picker')
+export class OutPortPicker extends LitElement {
 
     @property()
-    midiAccess: MidiAccess | null = null;
+    private _midiAccess: MidiAccess | null = null;
+    get midiAccess(): MidiAccess | null { return this._midiAccess; }
+    set midiAccess(value: MidiAccess | null) {
+        if (this._midiAccess != null)
+            this._midiAccess.portChanged.remove(x => x.logic === this._onMidiAccessPortChange);
+        this._midiAccess = value;
+        if (this._midiAccess != null)
+            this._midiAccess.portChanged.add(this._onMidiAccessPortChange);
+    }
 
     @property()
     midiOut: MidiOut | null = null;
@@ -15,6 +23,10 @@ export class MidiOutPicker extends LitElement {
         if (!this.midiAccess)
             return [];
         return this.midiAccess.getOutPortNames();
+    }
+
+    private _onMidiAccessPortChange = () => {
+        this.requestUpdate();
     }
 
     private _onSelectedPortChange(evt: Event): void {
@@ -46,6 +58,6 @@ export class MidiOutPicker extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'midi-out-picker': MidiOutPicker
+    'out-port-picker': OutPortPicker
   }
 }

@@ -1,2 +1,2 @@
 import './my-element';
-import './midi-out-picker';
+import './out-port-picker';
