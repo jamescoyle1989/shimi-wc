@@ -1,13 +1,14 @@
 {
   "name": "shlit",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "lit": "^2.7.6"
+    "lit": "^2.7.6",
+    "shimi": "^2.4.0"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
