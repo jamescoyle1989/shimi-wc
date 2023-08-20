@@ -7,8 +7,13 @@
     <script type="module" src="../dist/elements.mjs"></script>
   </head>
   <body>
-    <my-element>
+    <my-element id="mine">
       <h1>Vite + Lit</h1>
     </my-element>
+
+    <script type="module">
+        const myElement = document.getElementById('mine');
+        console.log(myElement.docsHint);
+    </script>
   </body>
 </html>
