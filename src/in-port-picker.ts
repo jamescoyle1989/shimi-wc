@@ -1,9 +1,9 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { MidiOut, MidiAccess } from 'shimi';
+import { MidiIn, MidiAccess } from 'shimi';
 
-@customElement('out-port-picker')
-export class OutPortPicker extends LitElement {
+@customElement('in-port-picker')
+export class InPortPicker extends LitElement {
 
     @property()
     private _midiAccess: MidiAccess | null = null;
@@ -17,12 +17,12 @@ export class OutPortPicker extends LitElement {
     }
 
     @property()
-    midiOut: MidiOut | null = null;
+    midiIn: MidiIn | null = null;
 
     portNames(): Array<string> {
         if (!this.midiAccess)
             return [];
-        return this.midiAccess.getOutPortNames();
+        return this.midiAccess.getInPortNames();
     }
 
     private _onMidiAccessPortChange = () => {
@@ -33,9 +33,9 @@ export class OutPortPicker extends LitElement {
         if (!this.midiAccess)
             return;
         const select = evt.target as HTMLSelectElement;
-        const newValue = this.midiAccess?.getOutPort(select.value);
-        if (this.midiOut)
-            this.midiOut.port = newValue;
+        const newValue = this.midiAccess?.getInPort(select.value);
+        if (this.midiIn)
+            this.midiIn.port = newValue;
         this.dispatchEvent(new CustomEvent('port-change', {
             detail: newValue,
             bubbles: true,
@@ -53,11 +53,10 @@ export class OutPortPicker extends LitElement {
             </select>
         `;
     }
-
 }
 
 declare global {
     interface HTMLElementTagNameMap {
-        'out-port-picker': OutPortPicker
+        'in-port-picker': InPortPicker
     }
 }

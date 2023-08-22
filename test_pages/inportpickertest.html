@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/shimi"></script>
+    <script type="module" src="../dist/elements.mjs"></script>
+  </head>
+  <body>
+    <in-port-picker id="testee">
+    </in-port-picker>
+
+    <script type="module">
+        async function run() {
+            const midiAccess = await shimi.MidiAccess.request();
+            const midiIn = new shimi.MidiIn();
+
+            const myElement = document.getElementById('testee');
+            myElement.midiAccess = midiAccess;
+            myElement.midiIn = midiIn;
+            myElement.addEventListener('port-change', evt => console.log(evt.detail));
+        }
+        run();
+    </script>
+  </body>
+</html>
