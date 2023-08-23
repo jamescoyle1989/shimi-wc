@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { MidiIn, MidiAccess } from 'shimi';
 
 @customElement('in-port-picker')
@@ -19,6 +19,9 @@ export class InPortPicker extends LitElement {
     @property()
     midiIn: MidiIn | null = null;
 
+    @state()
+    private _port: string = '';
+
     portNames(): Array<string> {
         if (!this.midiAccess)
             return [];
@@ -34,6 +37,7 @@ export class InPortPicker extends LitElement {
             return;
         const select = evt.target as HTMLSelectElement;
         const newValue = this.midiAccess?.getInPort(select.value);
+        this._port = select.value;
         if (this.midiIn)
             this.midiIn.port = newValue;
         this.dispatchEvent(new CustomEvent('port-change', {
@@ -47,12 +51,14 @@ export class InPortPicker extends LitElement {
         const me = this;
         return html`
             <select @change=${me._onSelectedPortChange}>
+                <option ?selected=${me._port == ''}></option>
                 ${this.portNames().map(portName => html`
                     <option>${portName}</option>
                 `)}
             </select>
         `;
     }
+    
 }
 
 declare global {
