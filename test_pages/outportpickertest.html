@@ -7,7 +7,7 @@
     <script type="module" src="../dist/shlit.mjs"></script>
   </head>
   <body>
-    <out-port-picker id="testee">
+    <out-port-picker id="testee" port="loopMIDI Port">
     </out-port-picker>
 
     <script type="module">
@@ -16,9 +16,9 @@
             const midiOut = new shimi.MidiOut();
 
             const myElement = document.getElementById('testee');
+            myElement.addEventListener('port-change', evt => console.log(evt.detail));
             myElement.midiAccess = midiAccess;
             myElement.midiOut = midiOut;
-            myElement.addEventListener('port-change', evt => console.log(evt.detail));
         }
         run();
     </script>
