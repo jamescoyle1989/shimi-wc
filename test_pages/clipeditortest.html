@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/shimi"></script>
+    <script type="module" src="../dist/shlit.mjs"></script>
+  </head>
+  <body>
+    <clip-editor id="testee" beats-per-bar="3" divisions-per-beat="2" x-zoom="2">
+    </clip-editor>
+
+    <script type="module">
+        async function run() {
+            const clip = new shimi.Clip(4)
+                .addNote([0, 2], 1, 'C4', 80);
+
+            const myElement = document.getElementById('testee');
+            myElement.clip = clip;
+        }
+        run();
+    </script>
+  </body>
+</html>
