@@ -121,8 +121,8 @@ export class ClipEditor extends LitElement {
         this._behavior.onMouseUp(this._getCursorPoint(evt), evt.button);
     }
 
-    private _onMouseLeave(): void {
-
+    private _onMouseLeave(evt: MouseEvent): void {
+        this._behavior.onMouseLeave(this._getCursorPoint(evt), evt.button);
     }
 
     firstUpdated() {

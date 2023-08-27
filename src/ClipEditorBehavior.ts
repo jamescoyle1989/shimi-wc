@@ -85,6 +85,15 @@ export class ClipEditorBehavior {
         }
     }
 
+    onMouseLeave(cartesian: {x: number, y: number}, button: number): void {
+        const vm = this._viewModel;
+        this._dragMode = dragModes.none;
+        if (!!vm.clip && !!vm.selectedNote && vm.selectedNote.duration <= 0)
+            vm.clip.notes = vm.clip.notes.filter(n => n !== vm.selectedNote);
+        vm.selectedNote = null;
+        this._clipEditor.requestUpdate();
+    }
+
 
 
     private _addNewNote(beat: number, pitch: number): void {
