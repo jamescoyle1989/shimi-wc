@@ -20,6 +20,10 @@ export class ClipEditorViewModel {
 
     selectedNote: ClipNote | null = null;
 
+    minPitch: number = 0;
+
+    maxPitch: number = 127;
+
     get beatWidth(): number { return 50 * this.xZoom; }
 
     get pitchHeight(): number { return 10 * this.yZoom; }
@@ -27,6 +31,14 @@ export class ClipEditorViewModel {
     get clipBeats(): number { return this.clip?.duration ?? 0; }
 
     get beatsPerDivision(): number { return 1 / this.divisionsPerBeat; }
+
+    get pitches(): Array<number> {
+        const output = [];
+        for (let i = this.maxPitch; i >= this.minPitch; i--) {
+            output.push(i);
+        }
+        return output;
+    }
 
     pitchIsBlack(pitch: number): boolean {
         const m = pitch % 12;
@@ -42,11 +54,12 @@ export class ClipEditorViewModel {
     }
 
     getYFromPitch(pitch: number): number {
-        return (127 - pitch) * this.pitchHeight;
+        return this.pitches.indexOf(pitch) * this.pitchHeight;
     }
 
     getPitchFromY(y: number): number {
-        return Math.min(127, Math.max(0, 127 - Math.floor(y / this.pitchHeight)));
+        const index = Math.floor(y / this.pitchHeight);
+        return Math.min(127, Math.max(0, this.pitches[index]));
     }
 
     getBeatLines(): Array<{beat: number, class: string}> {

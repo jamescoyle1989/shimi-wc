@@ -1,7 +1,7 @@
 import { LitElement, TemplateResult, css, html, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
-import { Clip } from 'shimi';
+import { Clip, pitch } from 'shimi';
 import { ClipEditorViewModel } from './ClipEditorViewModel';
 import { ClipEditorBehavior } from './ClipEditorBehavior';
 
@@ -58,6 +58,32 @@ export class ClipEditor extends LitElement {
         this.requestUpdate('divisionsPerBeat', oldValue);
     }
 
+    @property({attribute: 'min-pitch', type: String, reflect: true})
+    get minPitch(): number | string { return this._viewModel.minPitch; }
+    set minPitch(value: number | string) {
+        const oldValue = this._viewModel.minPitch;
+        if (typeof value === 'string') {
+            try { value = pitch(value); } catch (err1) {
+                try { value = Number(value); } catch (err2) { return; }
+            }
+        }
+        this._viewModel.minPitch = Math.max(0, Math.round(value));
+        this.requestUpdate('minPitch', oldValue);
+    }
+
+    @property({attribute: 'max-pitch', type: String, reflect: true})
+    get maxPitch(): number | string { return this._viewModel.maxPitch; }
+    set maxPitch(value: number | string) {
+        const oldValue = this._viewModel.maxPitch;
+        if (typeof value === 'string') {
+            try { value = pitch(value); } catch (err1) {
+                try { value = Number(value); } catch (err2) { return; }
+            }
+        }
+        this._viewModel.maxPitch = Math.min(127, Math.round(value));
+        this.requestUpdate('maxPitch', oldValue);
+    }
+
     private _svg: Ref<SVGElement> = createRef();
 
     private _svgPoint: SVGPoint | null = null;
@@ -96,7 +122,7 @@ export class ClipEditor extends LitElement {
     render() {
         const vm = this._viewModel;
         return html`
-            <svg :viewBox="0 0 ${vm.clipBeats * vm.beatWidth} ${128 * vm.pitchHeight}"
+            <svg :viewBox="0 0 ${vm.clipBeats * vm.beatWidth} ${vm.pitches.length * vm.pitchHeight}"
                 preserveAspectRatio="none" fill="#666666"
                 ${ref(this._svg)} class="edit-area"
                 @mousedown=${this._onMouseDown}
@@ -104,11 +130,11 @@ export class ClipEditor extends LitElement {
                 @mouseup=${this._onMouseUp}
                 @mouseleave=${this._onMouseLeave}
                 width=${vm.clipBeats * vm.beatWidth}
-                height=${128 * vm.pitchHeight}>
+                height=${vm.pitches.length * vm.pitchHeight}>
 
                 <rect x="0" y="0" 
                     width=${vm.clipBeats * vm.beatWidth}
-                    height=${128 * vm.pitchHeight}
+                    height=${vm.pitches.length * vm.pitchHeight}
                     fill="#666"></rect>
 
                 ${this._renderBlackLines()}
@@ -123,7 +149,7 @@ export class ClipEditor extends LitElement {
     private _renderBlackLines(): Array<TemplateResult> {
         const vm = this._viewModel;
         const output: Array<TemplateResult> = [];
-        for (let p = 127; p >= 0; p--) {
+        for (const p of vm.pitches) {
             if (vm.pitchIsBlack(p)) {
                 output.push(svg`
                     <rect x="0" y=${vm.getYFromPitch(p)}
@@ -142,7 +168,7 @@ export class ClipEditor extends LitElement {
         for (const line of vm.getBeatLines()) {
             output.push(svg`
                 <line x1=${line.beat * vm.beatWidth} y1="-10" 
-                    x2=${line.beat * vm.beatWidth} y2=${128 * vm.pitchHeight}
+                    x2=${line.beat * vm.beatWidth} y2=${vm.pitches.length * vm.pitchHeight}
                     class=${line.class}/>
             `);
         }
