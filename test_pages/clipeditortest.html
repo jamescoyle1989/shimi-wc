@@ -16,11 +16,11 @@
     <script>
         const myElement = document.getElementById('testee');
         
-        const scale = shimi.ScaleTemplate.major.create('F#');
+        const scale = shimi.ScaleTemplate.major.create('C');
         const clip = new shimi.Clip(4)
             .addNote([0, 2], 1, 'C4', 80);
         myElement.clip = clip;
-        myElement.pitchFilter = p => p % 2 == 0;
+        myElement.pitchFilter = null;
 
         function randomiseMinPitch() {
             myElement.minPitch = Math.random() * 36;

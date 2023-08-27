@@ -88,9 +88,11 @@ export class ClipEditor extends LitElement {
     get pitchFilter(): ((pitch: number) => boolean) | null { return this._viewModel.pitchFilter; }
     set pitchFilter(value: ((pitch: number) => boolean) | Scale | null) {
         const oldValue = this._viewModel.pitchFilter;
-        const scale = value as Scale;
-        if (scale.contains != undefined)
-            value = (p: number) => scale.contains(p);
+        if (value != null) {
+            const scale = value as Scale;
+            if (scale.contains != undefined)
+                value = (p: number) => scale.contains(p);
+        }
         this._viewModel.pitchFilter = value as (((pitch: number) => boolean) | null);
         this.requestUpdate('pitchFilter', oldValue);
     }
@@ -150,6 +152,8 @@ export class ClipEditor extends LitElement {
 
                 ${this._renderBlackLines()}
 
+                ${this._renderPitchSeparatorLines()}
+
                 ${this._renderBeatLines()}
 
                 ${this._renderNotes()}
@@ -173,12 +177,33 @@ export class ClipEditor extends LitElement {
         return output;
     }
 
+    private _renderPitchSeparatorLines(): Array<TemplateResult> {
+        const vm = this._viewModel;
+        const output: Array<TemplateResult> = [];
+        if (vm.pitches.length == 0)
+            return output;
+        let isPreviousPitchBlack = vm.pitchIsBlack(vm.pitches[0]);
+        for (let i = 1; i < vm.pitches.length; i++) {
+            const pitch = vm.pitches[i];
+            const isCurrentPitchBlack = vm.pitchIsBlack(pitch);
+            if (isPreviousPitchBlack == isCurrentPitchBlack) {
+                output.push(svg`
+                    <line x1="0" y1=${i * vm.pitchHeight}
+                        x2=${vm.clipBeats * vm.beatWidth} y2=${i * vm.pitchHeight}
+                        class="pitch-separator-line"/>
+                `);
+            }
+            isPreviousPitchBlack = isCurrentPitchBlack;
+        }
+        return output;
+    }
+
     private _renderBeatLines(): Array<TemplateResult> {
         const vm = this._viewModel;
         const output: Array<TemplateResult> = [];
         for (const line of vm.getBeatLines()) {
             output.push(svg`
-                <line x1=${line.beat * vm.beatWidth} y1="-10" 
+                <line x1=${line.beat * vm.beatWidth} y1="0" 
                     x2=${line.beat * vm.beatWidth} y2=${vm.pitches.length * vm.pitchHeight}
                     class=${line.class}/>
             `);
@@ -219,6 +244,11 @@ export class ClipEditor extends LitElement {
             stroke: #A0A0A0;
             stroke-width: 1;
             stroke-dasharray: 2,5;
+        }
+
+        .pitch-separator-line {
+            stroke: #5E5E5E;
+            stroke-width: 1;
         }
     `;
 }

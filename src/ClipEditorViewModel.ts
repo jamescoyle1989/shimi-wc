@@ -1,4 +1,4 @@
-import { Clip, ClipNote, Scale } from 'shimi';
+import { Clip, ClipNote } from 'shimi';
 
 /** Contains values that ClipEditor properties depend on, as well as helper properties & methods */
 export class ClipEditorViewModel {
