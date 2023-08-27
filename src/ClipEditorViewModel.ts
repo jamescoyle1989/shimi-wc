@@ -1,4 +1,4 @@
-import { Clip, ClipNote } from 'shimi';
+import { Clip, ClipNote, Scale } from 'shimi';
 
 /** Contains values that ClipEditor properties depend on, as well as helper properties & methods */
 export class ClipEditorViewModel {
@@ -20,9 +20,45 @@ export class ClipEditorViewModel {
 
     selectedNote: ClipNote | null = null;
 
-    minPitch: number = 0;
+    private _minPitch: number = 0;
+    get minPitch(): number { return this._minPitch; }
+    set minPitch(value: number) {
+        if (value == this._minPitch)
+            return;
+        this._minPitch = value;
+        this._pitchesCache = null;
+    }
 
-    maxPitch: number = 127;
+    private _maxPitch: number = 127;
+    get maxPitch(): number { return this._maxPitch; }
+    set maxPitch(value: number) {
+        if (value == this._maxPitch)
+            return;
+        this._maxPitch = value;
+        this._pitchesCache = null;
+    }
+
+    private _pitchFilter: ((pitch: number) => boolean) | null = null;
+    get pitchFilter(): ((pitch: number) => boolean) | null { return this._pitchFilter; }
+    set pitchFilter(value: ((pitch: number) => boolean) | null) {
+        if (value === this._pitchFilter)
+            return;
+        this._pitchFilter = value;
+        this._pitchesCache = null;
+    }
+    
+    private _pitchesCache: Array<number> | null = null;
+    get pitches(): Array<number> {
+        if (this._pitchesCache == null) {
+            const output = [];
+            for (let i = this.maxPitch; i >= this.minPitch; i--) {
+                if (this.pitchFilter == null || this.pitchFilter(i))
+                    output.push(i);
+            }
+            this._pitchesCache = output;
+        }
+        return this._pitchesCache;
+    }
 
     get beatWidth(): number { return 50 * this.xZoom; }
 
@@ -31,14 +67,6 @@ export class ClipEditorViewModel {
     get clipBeats(): number { return this.clip?.duration ?? 0; }
 
     get beatsPerDivision(): number { return 1 / this.divisionsPerBeat; }
-
-    get pitches(): Array<number> {
-        const output = [];
-        for (let i = this.maxPitch; i >= this.minPitch; i--) {
-            output.push(i);
-        }
-        return output;
-    }
 
     pitchIsBlack(pitch: number): boolean {
         const m = pitch % 12;

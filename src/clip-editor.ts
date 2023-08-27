@@ -1,7 +1,7 @@
 import { LitElement, TemplateResult, css, html, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
-import { Clip, pitch } from 'shimi';
+import { Clip, Scale, pitch } from 'shimi';
 import { ClipEditorViewModel } from './ClipEditorViewModel';
 import { ClipEditorBehavior } from './ClipEditorBehavior';
 
@@ -82,6 +82,17 @@ export class ClipEditor extends LitElement {
         }
         this._viewModel.maxPitch = Math.min(127, Math.round(value));
         this.requestUpdate('maxPitch', oldValue);
+    }
+
+    @property({attribute: false})
+    get pitchFilter(): ((pitch: number) => boolean) | null { return this._viewModel.pitchFilter; }
+    set pitchFilter(value: ((pitch: number) => boolean) | Scale | null) {
+        const oldValue = this._viewModel.pitchFilter;
+        const scale = value as Scale;
+        if (scale.contains != undefined)
+            value = (p: number) => scale.contains(p);
+        this._viewModel.pitchFilter = value as (((pitch: number) => boolean) | null);
+        this.requestUpdate('pitchFilter', oldValue);
     }
 
     private _svg: Ref<SVGElement> = createRef();

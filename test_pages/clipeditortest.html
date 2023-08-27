@@ -8,7 +8,7 @@
   </head>
   <body>
     <clip-editor id="testee" beats-per-bar="3" divisions-per-beat="2"
-                x-zoom="2" min-pitch="C#3" max-pitch="Gb5">
+                x-zoom="2" min-pitch="48" max-pitch="72">
     </clip-editor>
 
     <button onclick="randomiseMinPitch()">Click!</button>
@@ -16,9 +16,11 @@
     <script>
         const myElement = document.getElementById('testee');
         
+        const scale = shimi.ScaleTemplate.major.create('F#');
         const clip = new shimi.Clip(4)
             .addNote([0, 2], 1, 'C4', 80);
         myElement.clip = clip;
+        myElement.pitchFilter = p => p % 2 == 0;
 
         function randomiseMinPitch() {
             myElement.minPitch = Math.random() * 36;
