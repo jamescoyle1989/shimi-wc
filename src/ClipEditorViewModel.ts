@@ -1,4 +1,5 @@
 import { Clip, ClipNote } from 'shimi';
+import chroma from 'chroma-js';
 
 /** Contains values that ClipEditor properties depend on, as well as helper properties & methods */
 export class ClipEditorViewModel {
@@ -59,6 +60,8 @@ export class ClipEditorViewModel {
         }
         return this._pitchesCache;
     }
+
+    noteColor: (note: ClipNote, isSelected: boolean) => string = this._defaultNoteColor;
 
     get beatWidth(): number { return 50 * this.xZoom; }
 
@@ -133,5 +136,34 @@ export class ClipEditorViewModel {
         if (Math.abs(beat - nearestDivision) <= (this.beatsPerDivision * this.snapPercent))
             return nearestDivision;
         return beat;
+    }
+
+    private _defaultNoteColors: Array<string> = [
+        '#f44336',
+        '#e81e63',
+        '#9c27b0',
+        '#673ab7',
+        '#3f51b5',
+        '#2196f3',
+        '#03a9f4',
+        '#00bcd4',
+        '#009688',
+        '#4caf50',
+        '#8bc34a',
+        '#cddc39',
+        '#ffeb3b',
+        '#ffc107',
+        '#ff9800',
+        '#ff5722'
+    ];
+    private _defaultNoteColor(note: ClipNote, isSelected: boolean): string {
+        let chromaObj = chroma(this._defaultNoteColors[note.channel % 16]);
+        if (isSelected)
+            chromaObj = chromaObj.brighten(0.4);
+        if (typeof note.velocity === 'number')
+            chromaObj = chromaObj.alpha((note.velocity + 128) / 255);
+        else
+            chromaObj = chromaObj.alpha(0.75);
+        return chromaObj.hex();
     }
 }

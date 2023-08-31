@@ -1,7 +1,7 @@
 import { LitElement, TemplateResult, css, html, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
-import { Clip, Scale, pitch } from 'shimi';
+import { Clip, ClipNote, Scale, pitch } from 'shimi';
 import { ClipEditorViewModel } from './ClipEditorViewModel';
 import { ClipEditorBehavior } from './ClipEditorBehavior';
 
@@ -95,6 +95,14 @@ export class ClipEditor extends LitElement {
         }
         this._viewModel.pitchFilter = value as (((pitch: number) => boolean) | null);
         this.requestUpdate('pitchFilter', oldValue);
+    }
+
+    @property({attribute: false})
+    get noteColor(): (note: ClipNote, isSelected: boolean) => string { return this._viewModel.noteColor; }
+    set noteColor(value: (note: ClipNote, isSelected: boolean) => string) {
+        const oldValue = this._viewModel.noteColor;
+        this._viewModel.noteColor = value;
+        this.requestUpdate('noteColor', oldValue);
     }
 
     private _svg: Ref<SVGElement> = createRef();
@@ -221,7 +229,7 @@ export class ClipEditor extends LitElement {
                     height=${vm.pitchHeight}
                     width=${note.duration * vm.beatWidth}
                     stroke="black" stroke-width="0.5"
-                    fill="green"></rect>
+                    fill=${vm.noteColor(note, note === vm.selectedNote)}></rect>
             `);
         }
         return output;
