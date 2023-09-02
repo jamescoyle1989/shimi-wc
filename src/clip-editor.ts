@@ -105,6 +105,46 @@ export class ClipEditor extends LitElement {
         this.requestUpdate('noteColor', oldValue);
     }
 
+    @property({attribute: false})
+    get canAddNote(): (note: ClipNote) => boolean { return this._viewModel.canAddNote; }
+    set canAddNote(value: (note: ClipNote) => boolean) {
+        const oldValue = this._viewModel.canAddNote;
+        this._viewModel.canAddNote = value;
+        this.requestUpdate('canAddNote', oldValue);
+    }
+
+    @property({attribute: false})
+    get canEditNoteStart(): (note: ClipNote) => boolean { return this._viewModel.canEditNoteStart; }
+    set canEditNoteStart(value: (note: ClipNote) => boolean) {
+        const oldValue = this._viewModel.canEditNoteStart;
+        this._viewModel.canEditNoteStart = value;
+        this.requestUpdate('canEditNoteStart', oldValue);
+    }
+
+    @property({attribute: false})
+    get canEditNoteEnd(): (note: ClipNote) => boolean { return this._viewModel.canEditNoteEnd; }
+    set canEditNoteEnd(value: (note: ClipNote) => boolean) {
+        const oldValue = this._viewModel.canEditNoteEnd;
+        this._viewModel.canEditNoteEnd = value;
+        this.requestUpdate('canEditNoteEnd', oldValue);
+    }
+
+    @property({attribute: false})
+    get canEditNotePitch(): (note: ClipNote) => boolean { return this._viewModel.canEditNotePitch; }
+    set canEditNotePitch(value: (note: ClipNote) => boolean) {
+        const oldValue = this._viewModel.canEditNotePitch;
+        this._viewModel.canEditNotePitch = value;
+        this.requestUpdate('canEditNotePitch', oldValue);
+    }
+
+    @property({attribute: false})
+    get canDeleteNote(): (note: ClipNote) => boolean { return this._viewModel.canDeleteNote; }
+    set canDeleteNote(value: (note: ClipNote) => boolean) {
+        const oldValue = this._viewModel.canDeleteNote;
+        this._viewModel.canDeleteNote = value;
+        this.requestUpdate('canDeleteNote', oldValue);
+    }
+
     private _svg: Ref<SVGElement> = createRef();
 
     private _svgPoint: SVGPoint | null = null;

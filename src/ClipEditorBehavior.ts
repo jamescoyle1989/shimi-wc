@@ -8,7 +8,8 @@ const dragModes = {
     wholeNote: 1,
     noteEnd: 2,
     noteStart: 3,
-    noteCreation: 4
+    noteCreation: 4,
+    pitch: 5
 }
 
 export class ClipEditorBehavior {
@@ -71,6 +72,9 @@ export class ClipEditorBehavior {
             if (newNoteEnd > vm.selectedNote.start)
                 vm.selectedNote.end = newNoteEnd;
         }
+        else if (this._dragMode == dragModes.pitch) {
+            vm.selectedNote.pitch = vm.getPitchFromY(cartesian.y);
+        }
         this._clipEditor.requestUpdate();
     }
 
@@ -104,6 +108,8 @@ export class ClipEditorBehavior {
             pitch,
             80
         );
+        if (!vm.canAddNote(newNote))
+            return;
         vm.clip?.notes.push(newNote);
         vm.selectedNote = newNote;
         this._dragMode = dragModes.noteCreation;
@@ -113,6 +119,8 @@ export class ClipEditorBehavior {
     private _removeNote(note: ClipNote): void {
         const vm = this._viewModel;
         if (!vm.clip)
+            return;
+        if (!vm.canDeleteNote(note))
             return;
         vm.clip.notes = vm.clip.notes.filter(n => n !== note);
         vm.selectedNote = null;
@@ -125,12 +133,20 @@ export class ClipEditorBehavior {
         if (!vm.clip)
             return;
         const grabPercent = note.getPercent(beat);
-        if (grabPercent <= vm.noteGrabEndsPercent)
-            this._dragMode = dragModes.noteStart;
-        else if (grabPercent >= 1 - vm.noteGrabEndsPercent)
-            this._dragMode = dragModes.noteEnd;
-        else
+        if (grabPercent <= vm.noteGrabEndsPercent) {
+            if (vm.canEditNoteStart(note))
+                this._dragMode = dragModes.noteStart;
+        }
+        else if (grabPercent >= 1 - vm.noteGrabEndsPercent) {
+            if (vm.canEditNoteEnd(note))
+                this._dragMode = dragModes.noteEnd;
+        }
+        else if (vm.canEditNoteStart(note) && vm.canEditNoteEnd(note)) {
             this._dragMode = dragModes.wholeNote;
+        }
+        else if (vm.canEditNotePitch(note)) {
+            this._dragMode = dragModes.pitch;
+        }
 
         if (this._dragMode == dragModes.noteEnd)
             this._dragOffset = beat - note.end;

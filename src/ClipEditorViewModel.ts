@@ -63,6 +63,16 @@ export class ClipEditorViewModel {
 
     noteColor: (note: ClipNote, isSelected: boolean) => string = this._defaultNoteColor;
 
+    canAddNote: (note: ClipNote) => boolean = n => true;
+
+    canEditNoteStart: (note: ClipNote) => boolean = n => true;
+
+    canEditNoteEnd: (note: ClipNote) => boolean = n => true;
+
+    canEditNotePitch: (note: ClipNote) => boolean = n => true;
+
+    canDeleteNote: (note: ClipNote) => boolean = n => true;
+
     get beatWidth(): number { return 50 * this.xZoom; }
 
     get pitchHeight(): number { return 10 * this.yZoom; }
