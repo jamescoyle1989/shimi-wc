@@ -46,6 +46,10 @@ export class ClipEditorBehavior {
         }
     }
 
+    onDoubleClick(cartesian: {x: number, y: number}): void {
+        this.onMouseDown(cartesian, 1);
+    }
+
     onMouseMove(cartesian: {x: number, y: number}): void {
         const vm = this._viewModel;
         if (!vm.selectedNote || this._dragMode == dragModes.none)

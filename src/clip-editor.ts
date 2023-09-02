@@ -175,6 +175,10 @@ export class ClipEditor extends LitElement {
         this._behavior.onMouseLeave(this._getCursorPoint(evt), evt.button);
     }
 
+    private _onDoubleClick(evt: MouseEvent): void {
+        this._behavior.onDoubleClick(this._getCursorPoint(evt));
+    }
+
     firstUpdated() {
         const svg: any = this._svg.value;
         this._svgPoint = svg.createSVGPoint();
@@ -190,6 +194,7 @@ export class ClipEditor extends LitElement {
                 @mousemove=${this._onMouseMove}
                 @mouseup=${this._onMouseUp}
                 @mouseleave=${this._onMouseLeave}
+                @dblclick=${this._onDoubleClick}
                 width=${vm.clipBeats * vm.beatWidth}
                 height=${vm.pitches.length * vm.pitchHeight}>
 
@@ -276,6 +281,14 @@ export class ClipEditor extends LitElement {
     }
 
     static styles = css`
+        .edit-area {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -ms-user-select: none;
+        }
+
         .bar-line {
             stroke: #303030;
             stroke-width: 2;
