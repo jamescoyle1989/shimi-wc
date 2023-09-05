@@ -1,5 +1,5 @@
 import { LitElement, TemplateResult, css, html, svg } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { Clip, ClipNote, Scale, pitch } from 'shimi';
@@ -149,6 +149,9 @@ export class ClipEditor extends LitElement {
         this.requestUpdate('canDeleteNote', oldValue);
     }
 
+    @state()
+    private _highlightedPitch: number = -1;
+
     private _svg: Ref<SVGElement> = createRef();
 
     private _svgPoint: SVGPoint | null = null;
@@ -168,7 +171,9 @@ export class ClipEditor extends LitElement {
     }
 
     private _onMouseMove(evt: MouseEvent): void {
-        this._behavior.onMouseMove(this._getCursorPoint(evt));
+        const cursorPoint = this._getCursorPoint(evt);
+        this._highlightedPitch = this._viewModel.getPitchFromY(cursorPoint.y);
+        this._behavior.onMouseMove(cursorPoint);
     }
 
     private _onMouseUp(evt: MouseEvent): void {
@@ -176,6 +181,7 @@ export class ClipEditor extends LitElement {
     }
 
     private _onMouseLeave(evt: MouseEvent): void {
+        this._highlightedPitch = -1;
         this._behavior.onMouseLeave(this._getCursorPoint(evt), evt.button);
     }
 
@@ -276,17 +282,22 @@ export class ClipEditor extends LitElement {
 
         const textStyle = { fontSize: (vm.pitchHeight - 2) + 'px' };
 
+        function renderPitchNameAt(line: { beat: number, class: string}, pitch: number): TemplateResult {
+            return svg`
+            <text x=${(line.beat * vm.beatWidth) + 2}
+                  y=${(vm.getYFromPitch(pitch) + vm.pitchHeight) - (vm.pitchHeight / 5)}
+                  style=${styleMap(textStyle)}
+                  class="pitch-label">
+                ${vm.scale.getPitchName(pitch, true)}
+            </text>`;
+        }
+
         for (const line of vm.getBeatLines().filter(x => x.beat == 0 || x.class == 'bar-line')) {
-            for (const root of vm.pitches.filter(x => (x % 12) == (vm.scale.root % 12))) {
-                output.push(svg`
-                    <text x=${(line.beat * vm.beatWidth) + 2}
-                          y=${(vm.getYFromPitch(root) + vm.pitchHeight) - (vm.pitchHeight / 5)}
-                          style=${styleMap(textStyle)}
-                          class="pitch-label">
-                        ${vm.scale.getPitchName(root, true)}
-                    </text>
-                `);
-            }
+            for (const root of vm.pitches.filter(x => (x % 12) == (vm.scale.root % 12) && x != this._highlightedPitch))
+                output.push(renderPitchNameAt(line, root));
+
+            if (this._highlightedPitch >= 0)
+                output.push(renderPitchNameAt(line, this._highlightedPitch));
         }
         return output;
     }
