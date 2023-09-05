@@ -39,25 +39,30 @@ export class ClipEditorViewModel {
         this._pitchesCache = null;
     }
 
-    private _pitchFilter: ((pitch: number) => boolean) | null = null;
-    get pitchFilter(): ((pitch: number) => boolean) | null { return this._pitchFilter; }
-    set pitchFilter(value: ((pitch: number) => boolean) | null) {
-        if (value === this._pitchFilter)
+    private _scale: Scale = ScaleTemplate.major.create('C');
+    get scale(): Scale { return this._scale; }
+    set scale(value: Scale) {
+        if (value === this._scale)
             return;
-        this._pitchFilter = value;
+        this._scale = value;
         this._pitchesCache = null;
     }
 
-    private _scale: Scale = ScaleTemplate.major.create('C');
-    get scale(): Scale { return this._scale; }
-    set scale(value: Scale) { this._scale = value; }
+    private _filterPitchesByScale: boolean = false;
+    get filterPitchesByScale(): boolean { return this._filterPitchesByScale; }
+    set filterPitchesByScale(value: boolean) {
+        if (value == this._filterPitchesByScale)
+            return;
+        this._filterPitchesByScale = value;
+        this._pitchesCache = null;
+    }
     
     private _pitchesCache: Array<number> | null = null;
     get pitches(): Array<number> {
         if (this._pitchesCache == null) {
             const output = [];
             for (let i = this.maxPitch; i >= this.minPitch; i--) {
-                if (this.pitchFilter == null || this.pitchFilter(i))
+                if (!this.filterPitchesByScale || this.scale.contains(i))
                     output.push(i);
             }
             this._pitchesCache = output;

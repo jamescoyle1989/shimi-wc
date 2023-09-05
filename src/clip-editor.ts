@@ -86,16 +86,19 @@ export class ClipEditor extends LitElement {
     }
 
     @property({attribute: false})
-    get pitchFilter(): ((pitch: number) => boolean) | null { return this._viewModel.pitchFilter; }
-    set pitchFilter(value: ((pitch: number) => boolean) | Scale | null) {
-        const oldValue = this._viewModel.pitchFilter;
-        if (value != null) {
-            const scale = value as Scale;
-            if (scale.contains != undefined)
-                value = (p: number) => scale.contains(p);
-        }
-        this._viewModel.pitchFilter = value as (((pitch: number) => boolean) | null);
-        this.requestUpdate('pitchFilter', oldValue);
+    get scale(): Scale { return this._viewModel.scale; }
+    set scale(value: Scale) {
+        const oldValue = this._viewModel.scale;
+        this._viewModel.scale = value;
+        this.requestUpdate('scale', oldValue);
+    }
+
+    @property({attribute: 'filter-pitches-by-scale', type: Boolean})
+    get filterPitchesByScale(): boolean { return this._viewModel.filterPitchesByScale; }
+    set filterPitchesByScale(value: boolean) {
+        const oldValue = this._viewModel.filterPitchesByScale;
+        this._viewModel.filterPitchesByScale = value;
+        this.requestUpdate('filterPitchesByScale', oldValue);
     }
 
     @property({attribute: false})
@@ -274,13 +277,13 @@ export class ClipEditor extends LitElement {
         const textStyle = { fontSize: (vm.pitchHeight - 2) + 'px' };
 
         for (const line of vm.getBeatLines().filter(x => x.beat == 0 || x.class == 'bar-line')) {
-            for (const c of vm.pitches.filter(x => (x % 12) == 0)) {
+            for (const root of vm.pitches.filter(x => (x % 12) == (vm.scale.root % 12))) {
                 output.push(svg`
                     <text x=${(line.beat * vm.beatWidth) + 2}
-                          y=${(vm.getYFromPitch(c) + vm.pitchHeight) - (vm.pitchHeight / 5)}
+                          y=${(vm.getYFromPitch(root) + vm.pitchHeight) - (vm.pitchHeight / 5)}
                           style=${styleMap(textStyle)}
                           class="pitch-label">
-                        ${vm.scale.getPitchName(c, true)}
+                        ${vm.scale.getPitchName(root, true)}
                     </text>
                 `);
             }

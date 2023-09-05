@@ -14,13 +14,13 @@
     <input type="range" min="0.5" max="2" step="0.1" value="1" onchange="setYZoom(this)"/>
 
     <clip-editor id="testee" beats-per-bar="3" divisions-per-beat="2"
+                filter-pitches-by-scale="true"
                 min-pitch="48" max-pitch="72">
     </clip-editor>
 
     <script>
         const myElement = document.getElementById('testee');
-        
-        const scale = shimi.ScaleTemplate.major.create('C');
+        myElement.scale = shimi.ScaleTemplate.major.create('Bb');
         const clip = new shimi.Clip(4)
             .addNote([0, 2], 1, 'C4', 80);
         myElement.clip = clip;
