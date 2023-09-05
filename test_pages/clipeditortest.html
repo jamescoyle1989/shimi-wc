@@ -7,11 +7,15 @@
     <script type="module" src="../dist/shlit.mjs"></script>
   </head>
   <body>
-    <clip-editor id="testee" beats-per-bar="3" divisions-per-beat="2"
-                x-zoom="2" min-pitch="48" max-pitch="72">
-    </clip-editor>
-
     <button onclick="randomiseMinPitch()">Click!</button>
+
+    <input type="range" min="0.5" max="2" step="0.1" value="1" onchange="setXZoom(this)"/>
+
+    <input type="range" min="0.5" max="2" step="0.1" value="1" onchange="setYZoom(this)"/>
+
+    <clip-editor id="testee" beats-per-bar="3" divisions-per-beat="2"
+                min-pitch="48" max-pitch="72">
+    </clip-editor>
 
     <script>
         const myElement = document.getElementById('testee');
@@ -28,6 +32,14 @@
 
         function randomiseMinPitch() {
             myElement.minPitch = Math.random() * 36;
+        }
+
+        function setXZoom(slider) {
+            myElement.xZoom = slider.value;
+        }
+
+        function setYZoom(slider) {
+            myElement.yZoom = slider.value;
         }
     </script>
   </body>

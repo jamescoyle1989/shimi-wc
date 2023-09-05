@@ -1,6 +1,7 @@
 import { LitElement, TemplateResult, css, html, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { Clip, ClipNote, Scale, pitch } from 'shimi';
 import { ClipEditorViewModel } from './ClipEditorViewModel';
 import { ClipEditorBehavior } from './ClipEditorBehavior';
@@ -209,6 +210,8 @@ export class ClipEditor extends LitElement {
 
                 ${this._renderBeatLines()}
 
+                ${this._renderPitchNames()}
+
                 ${this._renderNotes()}
             </svg>
         `;
@@ -264,6 +267,27 @@ export class ClipEditor extends LitElement {
         return output;
     }
 
+    private _renderPitchNames(): Array<TemplateResult> {
+        const vm = this._viewModel;
+        const output: Array<TemplateResult> = [];
+
+        const textStyle = { fontSize: (vm.pitchHeight - 2) + 'px' };
+
+        for (const line of vm.getBeatLines().filter(x => x.beat == 0 || x.class == 'bar-line')) {
+            for (const c of vm.pitches.filter(x => (x % 12) == 0)) {
+                output.push(svg`
+                    <text x=${(line.beat * vm.beatWidth) + 2}
+                          y=${(vm.getYFromPitch(c) + vm.pitchHeight) - (vm.pitchHeight / 5)}
+                          style=${styleMap(textStyle)}
+                          class="pitch-label">
+                        ${vm.scale.getPitchName(c, true)}
+                    </text>
+                `);
+            }
+        }
+        return output;
+    }
+
     private _renderNotes(): Array<TemplateResult> {
         const vm = this._viewModel;
         const output: Array<TemplateResult> = [];
@@ -310,6 +334,12 @@ export class ClipEditor extends LitElement {
         .pitch-separator-line {
             stroke: #5E5E5E;
             stroke-width: 1;
+        }
+
+        .pitch-label {
+            fill: #FFFFFF99;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 20px;
         }
     `;
 }

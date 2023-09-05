@@ -1,4 +1,4 @@
-import { Clip, ClipNote } from 'shimi';
+import { Clip, ClipNote, Scale, ScaleTemplate } from 'shimi';
 import chroma from 'chroma-js';
 
 /** Contains values that ClipEditor properties depend on, as well as helper properties & methods */
@@ -47,6 +47,10 @@ export class ClipEditorViewModel {
         this._pitchFilter = value;
         this._pitchesCache = null;
     }
+
+    private _scale: Scale = ScaleTemplate.major.create('C');
+    get scale(): Scale { return this._scale; }
+    set scale(value: Scale) { this._scale = value; }
     
     private _pitchesCache: Array<number> | null = null;
     get pitches(): Array<number> {
@@ -73,9 +77,9 @@ export class ClipEditorViewModel {
 
     canDeleteNote: (note: ClipNote) => boolean = n => true;
 
-    get beatWidth(): number { return 50 * this.xZoom; }
+    get beatWidth(): number { return 100 * this.xZoom; }
 
-    get pitchHeight(): number { return 10 * this.yZoom; }
+    get pitchHeight(): number { return 20 * this.yZoom; }
 
     get clipBeats(): number { return this.clip?.duration ?? 0; }
 
