@@ -1,0 +1,215 @@
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { ClipEditor } from '../clip-editor';
+import { Clip, ScaleTemplate } from 'shimi';
+
+
+const meta: Meta<typeof ClipEditor> = {
+    title: 'ClipEditor',
+    tags: ['autodocs'],
+    render: (args: any) => {
+        const output = new ClipEditor();
+        for (const prop in args)
+            (output as any)[prop] = args[prop];
+        return output;
+    },
+    argTypes: {
+        clip: {
+            control: 'none',
+            description: 'The shimi.Clip object which the ClipEditor will display and enable editing of.'
+        },
+        minPitch: {
+            control: { type: 'number', min: 0, max: 127, step: 1 },
+            description: 'The minimum pitch in the piano roll which the ClipEditor will render.'
+        },
+        maxPitch: {
+            control: { type: 'number', min: 0, max: 127, step: 1 },
+            description: 'The maximum pitch in the piano roll which the ClipEditor will render.'
+        },
+        xZoom: {
+            control: { type: 'number', min: 0.5, max: 2, step: 0.1 },
+            description: 'Multiplier to be used when rendering x-coordinates in the component.'
+        },
+        yZoom: {
+            control: { type: 'number', min: 0.5, max: 2, step: 0.1 },
+            description: 'Multiplier to be used when rendering y-coordinates in the component.'
+        },
+        beatsPerBar: {
+            control: { type: 'number', min: 1, max: 8, step: 1 },
+            description: 'How many beat lines to render before a bar line occurs'
+        },
+        divisionsPerBeat: {
+            control: { type: 'number', min: 1, max: 8, step: 1 },
+            description: 'How many subdivisions to render per beat. These provide a useful visual cue where each beat divides, as well as note snapping.'
+        },
+        scale: {
+            control: 'none',
+            description: 'The scale object to use when getting pitch names.'
+        },
+        filterPitchesByScale: {
+            control: 'boolean',
+            description: 'If true, then only pitches which belong to the currently set scale will be rendered. Other pitches, as well as any notes on those pitches, won\'t be rendered.'
+        },
+        noteColor: {
+            control: 'none',
+            description: 'Function that takes in a shimi.ClipNote object & boolean flag representing whether that note is selected, and returns a string color value.'
+        },
+        canAddNote: {
+            control: 'none',
+            description: 'Function that takes in a shimi.ClipNote object, and returns true if that note would be allowed to be added. If you want to add custom modifications to notes added through the UI, this can also be a good place to do so.'
+        },
+        canEditNoteStart: {
+            control: 'none',
+            description: 'Function that takes in a shimi.ClipNote object, and returns true if the start of the note would be allowed to be altered.'
+        },
+        canEditNoteEnd: {
+            control: 'none',
+            description: 'Function that takes in a shimi.ClipNote object, and returns true if the end of the note would be allowed to be altered.'
+        },
+        canEditNotePitch: {
+            control: 'none',
+            description: 'Function that takes in a shimi.ClipNote object, and returns true if the pitch of the note would be allowed to be altered.'
+        },
+        canDeleteNote: {
+            control: 'none',
+            description: 'Function that takes in a shimi.ClipNote object, and returns true if the note would be allowed to be removed from the clip.'
+        }
+    }
+};
+export default meta;
+
+
+function twinkleTwinkle(): Clip {
+    return new Clip(8)
+        .addNote([0, 1], 1, 'C4', 80)
+        .addNote([2, 3], 1, 'G4', 80)
+        .addNote([4, 5], 1, 'A4', 80)
+        .addNote([6, 7], 1, 'G4', 80);
+}
+
+function multiChannelClip(): Clip {
+    return new Clip(8)
+        .addNote(0, 0.5, 'C4', 80, 0)
+        .addNote(0.5, 0.5, 'D4', 80, 1)
+        .addNote(1, 0.5, 'E4', 80, 2)
+        .addNote(1.5, 0.5, 'F4', 80, 3)
+        .addNote(2, 0.5, 'G4', 80, 4)
+        .addNote(2.5, 0.5, 'A4', 80, 5)
+        .addNote(3, 0.5, 'B4', 80, 6)
+        .addNote(3.5, 0.5, 'C5', 80, 7)
+        .addNote(4, 0.5, 'B4', 80, 8)
+        .addNote(4.5, 0.5, 'A4', 80, 9)
+        .addNote(5, 0.5, 'G4', 80, 10)
+        .addNote(5.5, 0.5, 'F4', 80, 11)
+        .addNote(6, 0.5, 'E4', 80, 12)
+        .addNote(6.5, 0.5, 'D4', 80, 13)
+        .addNote(7, 1, 'C4', 80, 14)
+
+}
+
+
+type Story = StoryObj<ClipEditor>;
+
+export const Primary: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 55,
+        maxPitch: 79
+    }
+};
+
+export const NoClip: Story = {
+    args: {
+    }
+};
+
+export const XAndYZoom: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        xZoom: 0.6,
+        yZoom: 1.5
+    }
+};
+
+export const BeatsPerBarAndDivisionsPerBeat: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        beatsPerBar: 3,
+        divisionsPerBeat: 5
+    }
+};
+
+export const WithScaleSet: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 55,
+        maxPitch: 79,
+        scale: ScaleTemplate.major.create('Gb')
+    }
+};
+
+export const FilterPitchesByScale: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 55,
+        maxPitch: 79,
+        scale: ScaleTemplate.major.create('G'),
+        filterPitchesByScale: true
+    }
+};
+
+export const DefaultNoteColoring: Story = {
+    args: {
+        clip: multiChannelClip(),
+        minPitch: 60,
+        maxPitch: 72
+    }
+};
+
+export const CanOnlyAddNotesBelowG4: Story = {
+    args: {
+        clip: new Clip(8),
+        minPitch: 60,
+        maxPitch: 72,
+        canAddNote: n => n.pitch < 67
+    }
+};
+
+export const CanOnlyEditNoteStartBeforeBeat4: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        canEditNoteStart: n => n.start < 4
+    }
+};
+
+export const CanOnlyEditNoteEndAboveF4: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        canEditNoteEnd: n => n.pitch > 65
+    }
+};
+
+export const CanOnlyEditNotePitchBeforeBeat4: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        canEditNotePitch: n => n.start < 4
+    }
+};
+
+export const CantDeleteNotes: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        canDeleteNote: n => false
+    }
+};
