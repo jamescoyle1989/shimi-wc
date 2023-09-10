@@ -60,3 +60,13 @@ export const PortPresetToInvalidName: Story = {
         port: 'Made Up Port'
     }
 };
+
+export const AdditionalPortAdded: Story = {
+    args: {
+        midiAccess: newMockMidiAccess()
+    },
+    play: async({ canvasElement }) => {
+        const outPicker = canvasElement.children.item(0) as OutPortPicker;
+        (outPicker.midiAccess as any).mockAddOutPort('Out Port 3')
+    }
+};
