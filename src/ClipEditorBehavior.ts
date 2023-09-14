@@ -137,11 +137,11 @@ export class ClipEditorBehavior {
         if (!vm.clip)
             return;
         const grabPercent = note.getPercent(beat);
-        if (grabPercent <= vm.noteGrabEndsPercent) {
+        if (grabPercent <= vm.noteResizeHandleArea) {
             if (vm.canEditNoteStart(note))
                 this._dragMode = dragModes.noteStart;
         }
-        else if (grabPercent >= 1 - vm.noteGrabEndsPercent) {
+        else if (grabPercent >= 1 - vm.noteResizeHandleArea) {
             if (vm.canEditNoteEnd(note))
                 this._dragMode = dragModes.noteEnd;
         }

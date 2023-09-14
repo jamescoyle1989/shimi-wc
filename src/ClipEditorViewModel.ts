@@ -14,10 +14,10 @@ export class ClipEditorViewModel {
     divisionsPerBeat: number = 2;
 
     //0.05 = that given the number of beats from one division to the next, we need to be within 5% of that distance from a division line to snap to it
-    snapPercent: number = 0.05;
+    snapStrength: number = 0.05;
 
     //0.2 = you can grab the initial 20% of a note to stretch it from the start, or the final 20% of a note to stretch it from the end. Grab it anywhere else and you'll move the whole note
-    noteGrabEndsPercent: number = 0.2;
+    noteResizeHandleArea: number = 0.2;
 
     selectedNote: ClipNote | null = null;
 
@@ -164,7 +164,7 @@ export class ClipEditorViewModel {
 
     getSnappedBeat(beat: number): number {
         const nearestDivision = this.getNearestDivisionBeat(beat);
-        if (Math.abs(beat - nearestDivision) <= (this.beatsPerDivision * this.snapPercent))
+        if (Math.abs(beat - nearestDivision) <= (this.beatsPerDivision * this.snapStrength))
             return nearestDivision;
         return beat;
     }

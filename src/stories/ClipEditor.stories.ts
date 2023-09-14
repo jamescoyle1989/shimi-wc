@@ -41,6 +41,14 @@ const meta: Meta<typeof ClipEditor> = {
             control: { type: 'number', min: 1, max: 8, step: 1 },
             description: 'How many subdivisions to render per beat. These provide a useful visual cue where each beat divides, as well as note snapping.'
         },
+        snapStrength: {
+            control: { type: 'number', min: 0, max: 1, step: 0.01 },
+            description: 'How strongly note starts & ends will snap to beat divisions. Default value = 0.05, meaning that given the distance from one beat division to the next, a note start or end must be within 5% of that distance from the division to snap to it.'
+        },
+        noteResizeHandleArea: {
+            control: { type: 'number', min: 0, max: 1, step: 0.01 },
+            description: 'How much of the note\'s area can be grabbed to resize it, rather than to move it. The default value = 0.2, meaning if you grab the left-most 20% of a note, you be resizing it from its start. Alternatively if you grab the right-most 20% of a note, you\'d be resizing it from its end.'
+        },
         scale: {
             control: 'none',
             description: 'The scale object to use when getting pitch names.'
@@ -139,6 +147,24 @@ export const BeatsPerBarAndDivisionsPerBeat: Story = {
         maxPitch: 72,
         beatsPerBar: 3,
         divisionsPerBeat: 5
+    }
+};
+
+export const HighSnapStrength: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        snapStrength: 0.5
+    }
+};
+
+export const NoNoteResizeHandleArea: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        noteResizeHandleArea: 0
     }
 };
 

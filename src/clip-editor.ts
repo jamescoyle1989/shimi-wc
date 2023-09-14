@@ -59,6 +59,22 @@ export class ClipEditor extends LitElement {
         this.requestUpdate('divisionsPerBeat', oldValue);
     }
 
+    @property({attribute: 'snap-strength', type: Number, reflect: true})
+    get snapStrength(): number { return this._viewModel.snapStrength; }
+    set snapStrength(value: number) {
+        const oldValue = this._viewModel.snapStrength;
+        this._viewModel.snapStrength = Math.min(Math.max(0, value), 1);
+        this.requestUpdate('snapStrength', oldValue);
+    }
+
+    @property({attribute: 'note-resize-handle-area', type: Number, reflect: true})
+    get noteResizeHandleArea(): number { return this._viewModel.noteResizeHandleArea; }
+    set noteResizeHandleArea(value: number) {
+        const oldValue = this._viewModel.noteResizeHandleArea;
+        this._viewModel.noteResizeHandleArea = Math.min(Math.max(0, value), 1);
+        this.requestUpdate('noteResizeHandleArea', oldValue);
+    }
+
     @property({attribute: 'min-pitch', type: String, reflect: true})
     get minPitch(): number | string { return this._viewModel.minPitch; }
     set minPitch(value: number | string) {
