@@ -90,6 +90,18 @@ export class ClipEditorViewModel {
 
     get beatsPerDivision(): number { return 1 / this.divisionsPerBeat; }
 
+    get totalWidth(): number {
+        if (!this.clip)
+            return 0;
+        return this.clipBeats * this.beatWidth;
+    }
+
+    get totalHeight(): number {
+        if (!this.clip)
+            return 0;
+        return this.pitches.length * this.pitchHeight;
+    }
+
     pitchIsBlack(pitch: number): boolean {
         const m = pitch % 12;
         return m == 1 || m == 3 || m == 6 || m == 8 || m == 10;

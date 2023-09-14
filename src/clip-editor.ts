@@ -197,7 +197,7 @@ export class ClipEditor extends LitElement {
     render() {
         const vm = this._viewModel;
         return html`
-            <svg :viewBox="0 0 ${vm.clipBeats * vm.beatWidth} ${vm.pitches.length * vm.pitchHeight}"
+            <svg :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
                 preserveAspectRatio="none" fill="#666666"
                 ${ref(this._svg)} class="edit-area"
                 @mousedown=${this._onMouseDown}
@@ -205,12 +205,12 @@ export class ClipEditor extends LitElement {
                 @mouseup=${this._onMouseUp}
                 @mouseleave=${this._onMouseLeave}
                 @dblclick=${this._onDoubleClick}
-                width=${vm.clipBeats * vm.beatWidth}
-                height=${vm.pitches.length * vm.pitchHeight}>
+                width=${vm.totalWidth}
+                height=${vm.totalHeight}>
 
                 <rect x="0" y="0" 
-                    width=${vm.clipBeats * vm.beatWidth}
-                    height=${vm.pitches.length * vm.pitchHeight}
+                    width=${vm.totalWidth}
+                    height=${vm.totalHeight}
                     fill="#666"></rect>
 
                 ${this._renderBlackLines()}
@@ -233,7 +233,7 @@ export class ClipEditor extends LitElement {
             if (vm.pitchIsBlack(p)) {
                 output.push(svg`
                     <rect x="0" y=${vm.getYFromPitch(p)}
-                        width=${vm.clipBeats * vm.beatWidth}
+                        width=${vm.totalWidth}
                         height=${vm.pitchHeight}
                         fill="#555"></rect>
                 `);
@@ -254,7 +254,7 @@ export class ClipEditor extends LitElement {
             if (isPreviousPitchBlack == isCurrentPitchBlack) {
                 output.push(svg`
                     <line x1="0" y1=${i * vm.pitchHeight}
-                        x2=${vm.clipBeats * vm.beatWidth} y2=${i * vm.pitchHeight}
+                        x2=${vm.totalWidth} y2=${i * vm.pitchHeight}
                         class="pitch-separator-line"/>
                 `);
             }
@@ -269,7 +269,7 @@ export class ClipEditor extends LitElement {
         for (const line of vm.getBeatLines()) {
             output.push(svg`
                 <line x1=${line.beat * vm.beatWidth} y1="0" 
-                    x2=${line.beat * vm.beatWidth} y2=${vm.pitches.length * vm.pitchHeight}
+                    x2=${line.beat * vm.beatWidth} y2=${vm.totalHeight}
                     class=${line.class}/>
             `);
         }
