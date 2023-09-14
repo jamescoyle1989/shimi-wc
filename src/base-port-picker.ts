@@ -89,4 +89,9 @@ export abstract class BasePortPicker extends LitElement {
         `;
     }
 
+    /** This causes the component to be rendered in the light DOM. Meaning that the basic layout of the picker can be more easily styled. */
+    protected createRenderRoot(): Element | ShadowRoot {
+        return this;
+    }
+
 }
