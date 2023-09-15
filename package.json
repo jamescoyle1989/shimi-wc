@@ -7,7 +7,7 @@
   "unpkg": "dist/index.mjs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jamescoyle1989/shlit.git"
+    "url": "https://github.com/jamescoyle1989/shimi-wc.git"
   },
   "keywords": [
     "midi",

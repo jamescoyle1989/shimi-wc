@@ -1,10 +1,10 @@
-# Shimi-WC
+# Shimi-wc
 
-![logo](https://raw.githubusercontent.com/jamescoyle1989/shlit/master/src/assets/logo180px.png)
+![logo](https://raw.githubusercontent.com/jamescoyle1989/shimi-wc/master/src/assets/logo180px.png)
 
 ## Overview
 
-Shimi-WC is a small collection of web components to aid in the creation of powerful MIDI applications with Shimi.
+Shimi-wc is a small collection of web components to aid in the creation of powerful MIDI applications with Shimi.
 
 
 ## Example
