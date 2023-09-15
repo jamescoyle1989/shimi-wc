@@ -1,10 +1,10 @@
 {
-  "name": "shlit",
+  "name": "shimi-wc",
   "version": "0.1.0",
   "description": "A collection of web components for building complex MIDI applications",
   "type": "module",
-  "main": "dist/shlit.mjs",
-  "unpkg": "dist/shlit.mjs",
+  "main": "dist/index.mjs",
+  "unpkg": "dist/index.mjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/jamescoyle1989/shlit.git"
@@ -22,7 +22,8 @@
   "scripts": {
     "build": "tsc && vite build",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "publish": "tsc && vite build && npm publish --access=public"
   },
   "dependencies": {
     "chroma-js": "^2.4.2",

@@ -1,10 +1,10 @@
-# Shlit
+# Shimi-WC
 
 ![logo](https://raw.githubusercontent.com/jamescoyle1989/shlit/master/src/assets/logo180px.png)
 
 ## Overview
 
-Shlit is a small collection of web components to aid in the creation of powerful MIDI applications with Shimi.
+Shimi-WC is a small collection of web components to aid in the creation of powerful MIDI applications with Shimi.
 
 
 ## Example
