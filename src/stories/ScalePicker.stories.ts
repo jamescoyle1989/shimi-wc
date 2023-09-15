@@ -4,7 +4,7 @@ import { ScalePicker } from '../scale-picker';
 import { ScaleTemplate } from 'shimi';
 
 
-const meta: Meta<typeof ScalePicker> = {
+const meta: Meta<ScalePicker> = {
     title: 'ScalePicker',
     tags: ['autodocs'],
     render: (args: any) => {

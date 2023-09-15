@@ -4,7 +4,7 @@ import { InPortPicker } from '../in-port-picker';
 import { newMockMidiAccess } from './Mocks';
 
 
-const meta: Meta<typeof InPortPicker> = {
+const meta: Meta<InPortPicker> = {
     title: 'InPortPicker',
     tags: ['autodocs'],
     render: (args: any) => {

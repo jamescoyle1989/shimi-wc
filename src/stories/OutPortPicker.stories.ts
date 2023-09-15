@@ -4,7 +4,7 @@ import { OutPortPicker } from '../out-port-picker';
 import { newMockMidiAccess } from './Mocks';
 
 
-const meta: Meta<typeof OutPortPicker> = {
+const meta: Meta<OutPortPicker> = {
     title: 'OutPortPicker',
     tags: ['autodocs'],
     render: (args: any) => {

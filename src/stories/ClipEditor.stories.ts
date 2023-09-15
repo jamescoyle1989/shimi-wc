@@ -3,7 +3,7 @@ import { ClipEditor } from '../clip-editor';
 import { Clip, ScaleTemplate } from 'shimi';
 
 
-const meta: Meta<typeof ClipEditor> = {
+const meta: Meta<ClipEditor> = {
     title: 'ClipEditor',
     tags: ['autodocs'],
     render: (args: any) => {
