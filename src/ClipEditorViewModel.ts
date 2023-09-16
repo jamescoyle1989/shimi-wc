@@ -121,6 +121,8 @@ export class ClipEditorViewModel {
 
     getPitchFromY(y: number): number {
         const index = Math.floor(y / this.pitchHeight);
+        if (index < 0 || index >= this.pitches.length)
+            return 0;
         return Math.min(127, Math.max(0, this.pitches[index]));
     }
 
