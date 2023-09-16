@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+### Fixed
+
+- Minor fix to readme link
+
 
 ## 0.1.2 (2023-09-16)
 

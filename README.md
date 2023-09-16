@@ -4,7 +4,7 @@
 
 ## Overview
 
-Shimi-wc is a small collection of web components to aid in the creation of powerful MIDI applications with ![Shimi](https://github.com/jamescoyle1989/shimi).
+Shimi-wc is a small collection of web components to aid in the creation of powerful MIDI applications with [Shimi](https://github.com/jamescoyle1989/shimi).
 
 Shimi came out of a desire to easily build new and experimental MIDI instruments out of user input devices, and these components are designed to provide easy support for visualizing/manipulating the MIDI data that you're working with.
 
