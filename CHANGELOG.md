@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+### Fixed
+
+- Improved welcome page on storybook site
+
+- Fixed support for disabling note pitch dragging
+
+- Moved storybook static site from 'storybook-static' to 'docs'
+
+
+## 0.1.1 (2023-09-15)
+
+### Fixed
+
+- Rebranded project to allow for publishing to npm
+
+
+## 0.1.0 (2023-09-14)
+
 ### Added
 
 - Added out-port-picker & in-port-picker
@@ -13,3 +31,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added scale-picker
 
 - Added clip-editor
+
+- Added storybook documentation
