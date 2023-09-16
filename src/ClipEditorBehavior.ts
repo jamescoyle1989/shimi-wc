@@ -5,11 +5,10 @@ import { ClipEditor } from './clip-editor';
 
 const dragModes = {
     none: 0,
-    wholeNote: 1,
-    noteEnd: 2,
-    noteStart: 3,
-    noteCreation: 4,
-    pitch: 5
+    noteCreation: 1,
+    noteStart: 2,
+    noteEnd: 4,
+    pitch: 8
 }
 
 export class ClipEditorBehavior {
@@ -55,30 +54,36 @@ export class ClipEditorBehavior {
         if (!vm.selectedNote || this._dragMode == dragModes.none)
             return;
 
+        const dragNoteCreation = (this._dragMode & dragModes.noteCreation) > 0;
+        const dragNoteStart = (this._dragMode & dragModes.noteStart) > 0;
+        const dragNoteEnd = (this._dragMode & dragModes.noteEnd) > 0;
+        const dragNotePitch = (this._dragMode & dragModes.pitch) > 0;
+
         const newDragBeat = vm.getSnappedBeat(vm.getBeatFromX(cartesian.x) - this._dragOffset);
-        if (this._dragMode == dragModes.wholeNote) {
+        if (dragNoteStart && dragNoteEnd) {
             vm.selectedNote.start = newDragBeat;
-            vm.selectedNote.pitch = vm.getPitchFromY(cartesian.y);
         }
-        else if (this._dragMode == dragModes.noteStart) {
+        else if (dragNoteStart) {
             if (newDragBeat < vm.selectedNote.end) {
                 const noteEnd = vm.selectedNote.end;
                 vm.selectedNote.start = newDragBeat;
                 vm.selectedNote.end = noteEnd;
             }
         }
-        else if (this._dragMode == dragModes.noteEnd) {
+        else if (dragNoteEnd) {
             if (newDragBeat > vm.selectedNote.start)
                 vm.selectedNote.end = newDragBeat;
         }
-        else if (this._dragMode == dragModes.noteCreation) {
+        else if (dragNoteCreation) {
             const newNoteEnd = vm.getNextDivisionBeat(vm.getBeatFromX(cartesian.x));
             if (newNoteEnd > vm.selectedNote.start)
                 vm.selectedNote.end = newNoteEnd;
         }
-        else if (this._dragMode == dragModes.pitch) {
+        
+        if (dragNotePitch) {
             vm.selectedNote.pitch = vm.getPitchFromY(cartesian.y);
         }
+
         this._clipEditor.requestUpdate();
     }
 
@@ -137,6 +142,10 @@ export class ClipEditorBehavior {
         if (!vm.clip)
             return;
         const grabPercent = note.getPercent(beat);
+
+        if (vm.canEditNotePitch(note)) {
+            this._dragMode = dragModes.pitch;
+        }
         if (grabPercent <= vm.noteResizeHandleArea) {
             if (vm.canEditNoteStart(note))
                 this._dragMode = dragModes.noteStart;
@@ -146,10 +155,7 @@ export class ClipEditorBehavior {
                 this._dragMode = dragModes.noteEnd;
         }
         else if (vm.canEditNoteStart(note) && vm.canEditNoteEnd(note)) {
-            this._dragMode = dragModes.wholeNote;
-        }
-        else if (vm.canEditNotePitch(note)) {
-            this._dragMode = dragModes.pitch;
+            this._dragMode += dragModes.noteStart + dragModes.noteEnd;
         }
 
         if (this._dragMode == dragModes.noteEnd)
