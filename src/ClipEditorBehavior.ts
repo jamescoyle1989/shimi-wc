@@ -3,7 +3,7 @@ import { ClipEditorViewModel } from './ClipEditorViewModel';
 import { ClipEditor } from './clip-editor';
 
 
-const dragModes = {
+export const dragModes = {
     none: 0,
     noteCreation: 1,
     noteStart: 2,
@@ -99,12 +99,7 @@ export class ClipEditorBehavior {
     }
 
     onMouseLeave(cartesian: {x: number, y: number}, button: number): void {
-        const vm = this._viewModel;
-        this._dragMode = dragModes.none;
-        if (!!vm.clip && !!vm.selectedNote && vm.selectedNote.duration <= 0)
-            vm.clip.notes = vm.clip.notes.filter(n => n !== vm.selectedNote);
-        vm.selectedNote = null;
-        this._clipEditor.requestUpdate();
+        this.onMouseUp(cartesian, 0);
     }
 
 
