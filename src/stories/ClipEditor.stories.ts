@@ -33,6 +33,14 @@ const meta: Meta<ClipEditor> = {
             control: { type: 'number', min: 0.5, max: 2, step: 0.1 },
             description: 'Multiplier to be used when rendering y-coordinates in the component.'
         },
+        width: {
+            control: { type: 'number', min: 100, max: 1000, step: 10 },
+            description: 'Controls the total width of the component.'
+        },
+        height: {
+            control: { type: 'number', min: 100, max: 1000, step: 10 },
+            description: 'Controls the total height of the component.'
+        },
         beatsPerBar: {
             control: { type: 'number', min: 1, max: 8, step: 1 },
             description: 'How many beat lines to render before a bar line occurs'
@@ -137,6 +145,16 @@ export const XAndYZoom: Story = {
         maxPitch: 72,
         xZoom: 0.6,
         yZoom: 1.5
+    }
+};
+
+export const WidthAndHeight: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72,
+        width: 500,
+        height: 500
     }
 };
 

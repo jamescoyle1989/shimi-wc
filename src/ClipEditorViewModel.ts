@@ -83,8 +83,10 @@ export class ClipEditorViewModel {
     canDeleteNote: (note: ClipNote) => boolean = n => true;
 
     get beatWidth(): number { return 100 * this.xZoom; }
+    set beatWidth(value: number) { this.xZoom = value / 100; }
 
     get pitchHeight(): number { return 20 * this.yZoom; }
+    set pitchHeight(value: number) { this.yZoom = value / 20; }
 
     get clipBeats(): number { return this.clip?.duration ?? 0; }
 
@@ -95,11 +97,21 @@ export class ClipEditorViewModel {
             return 0;
         return this.clipBeats * this.beatWidth;
     }
+    set totalWidth(value: number) {
+        if (!this.clip || this.clip.duration <= 0)
+            return;
+        this.beatWidth = value / this.clipBeats;
+    }
 
     get totalHeight(): number {
         if (!this.clip)
             return 0;
         return this.pitches.length * this.pitchHeight;
+    }
+    set totalHeight(value: number) {
+        if (!this.clip)
+            return;
+        this.pitchHeight = value / this.pitches.length;
     }
 
     pitchIsBlack(pitch: number): boolean {

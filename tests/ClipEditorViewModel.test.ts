@@ -403,3 +403,23 @@ test('getSnappedBeat can snap with 50% strength', () => {
     expect(model.getSnappedBeat(0.4999)).toBe(0);
     expect(model.getSnappedBeat(0.5)).toBe(1);
 });
+
+test('set totalWidth updates xZoom', () => {
+    const model = new ClipEditorViewModel();
+    model.clip = new Clip(4);
+    
+    model.totalWidth = 100;
+
+    expect(model.beatWidth).toBe(25);
+    expect(model.xZoom).toBe(0.25);
+});
+
+test('set totalHeight updates yZoom', () => {
+    const model = new ClipEditorViewModel();
+    model.clip = new Clip(4);
+
+    model.totalHeight = 640;
+    
+    expect(model.pitchHeight).toBe(5);
+    expect(model.yZoom).toBe(0.25);
+});

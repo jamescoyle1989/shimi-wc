@@ -43,6 +43,22 @@ export class ClipEditor extends LitElement {
         this.requestUpdate('yZoom', oldValue);
     }
 
+    @property({attribute: 'width', type: Number})
+    get width(): number { return this._viewModel.totalWidth; }
+    set width(value: number) {
+        const oldValue = this._viewModel.totalWidth;
+        this._viewModel.totalWidth = value;
+        this.requestUpdate('width', oldValue);
+    }
+
+    @property({attribute: 'height', type: Number})
+    get height(): number { return this._viewModel.totalHeight; }
+    set height(value: number) {
+        const oldValue = this._viewModel.totalHeight;
+        this._viewModel.totalHeight = value;
+        this.requestUpdate('height', oldValue);
+    }
+
     @property({attribute: 'beats-per-bar', type: Number, reflect: true})
     get beatsPerBar(): number { return this._viewModel.beatsPerBar; }
     set beatsPerBar(value: number) {
