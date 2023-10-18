@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+
+## 1.2.0 (2023-10-17)
+
 ### Added
 
 - Clip editor can add playheads that visually represent the moving position of a ClipPlayer
