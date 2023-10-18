@@ -1,5 +1,6 @@
 import { Clip, ClipNote, Scale, ScaleTemplate } from 'shimi';
 import chroma from 'chroma-js';
+import { ClipEditorPlayhead } from './ClipEditorPlayhead';
 
 /** Contains values that ClipEditor properties depend on, as well as helper properties & methods */
 export class ClipEditorViewModel {
@@ -20,6 +21,8 @@ export class ClipEditorViewModel {
     noteResizeHandleArea: number = 0.2;
 
     selectedNote: ClipNote | null = null;
+
+    playheads: Array<ClipEditorPlayhead> = [];
 
     private _minPitch: number = 0;
     get minPitch(): number { return this._minPitch; }

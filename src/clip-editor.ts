@@ -2,9 +2,10 @@ import { LitElement, TemplateResult, css, html, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { Clip, ClipNote, Scale, pitch } from 'shimi';
+import { Clip, ClipNote, ClipPlayer, Scale, pitch } from 'shimi';
 import { ClipEditorViewModel } from './ClipEditorViewModel';
 import { ClipEditorBehavior } from './ClipEditorBehavior';
+import { ClipEditorPlayhead } from './ClipEditorPlayhead';
 
 /** Contains attributes and rendering logic */
 @customElement('clip-editor')
@@ -184,6 +185,9 @@ export class ClipEditor extends LitElement {
     @state()
     private _highlightedPitch: number = -1;
 
+    @state()
+    private _playheadUpdateTicker: number = 0;
+
     private _svg: Ref<SVGElement> = createRef();
 
     private _svgPoint: SVGPoint | null = null;
@@ -221,6 +225,19 @@ export class ClipEditor extends LitElement {
         this._behavior.onDoubleClick(this._getCursorPoint(evt));
     }
 
+    addPlayhead(clipPlayer: ClipPlayer): ClipEditorPlayhead {
+        if (clipPlayer.clip != this.clip)
+            throw Error('Cannot add a playhead for a clip player that\'s playing a different clip than the one being edited');
+
+        const output = new ClipEditorPlayhead(this, clipPlayer);
+        this._viewModel.playheads.push(output);
+        return output;
+    }
+
+    markPlayheadsForUpdate(): void {
+        this._playheadUpdateTicker = (this._playheadUpdateTicker + 1) % 10000;
+    }
+
     firstUpdated() {
         const svg: any = this._svg.value;
         this._svgPoint = svg.createSVGPoint();
@@ -254,6 +271,8 @@ export class ClipEditor extends LitElement {
                 ${this._renderPitchNames()}
 
                 ${this._renderNotes()}
+
+                ${this._renderPlayheads()}
             </svg>
         `;
     }
@@ -350,6 +369,21 @@ export class ClipEditor extends LitElement {
         return output;
     }
 
+    private _renderPlayheads(): Array<TemplateResult> {
+        const vm = this._viewModel;
+        const output: Array<TemplateResult> = [];
+        for (const playhead of vm.playheads) {
+            const beat = (playhead.clipPlayer.startBeat + playhead.clipPlayer.beatsPassed) % this.clip.duration;
+
+            output.push(svg`
+                <line x1=${beat * vm.beatWidth} y1="0" 
+                    x2=${beat * vm.beatWidth} y2=${vm.totalHeight}
+                    class="playhead"/>
+            `);
+        }
+        return output;
+    }
+
     static styles = css`
         .edit-area {
             user-select: none;
@@ -386,6 +420,11 @@ export class ClipEditor extends LitElement {
             fill: #FFFFFF99;
             font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
             font-size: 20px;
+        }
+
+        .playhead {
+            stroke: #F02222;
+            stroke-width: 2;
         }
     `;
 }

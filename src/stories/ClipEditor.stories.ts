@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { ClipEditor } from '../clip-editor';
-import { Clip, ScaleTemplate } from 'shimi';
+import { Clip, ClipPlayer, Clock, Metronome, MidiBus, ScaleTemplate } from 'shimi';
 
 
 const meta: Meta<ClipEditor> = {
@@ -118,8 +118,7 @@ function multiChannelClip(): Clip {
         .addNote(5.5, 0.5, 'F4', 80, 11)
         .addNote(6, 0.5, 'E4', 80, 12)
         .addNote(6.5, 0.5, 'D4', 80, 13)
-        .addNote(7, 1, 'C4', 80, 14)
-
+        .addNote(7, 1, 'C4', 80, 14);
 }
 
 
@@ -257,3 +256,21 @@ export const CantDeleteNotes: Story = {
         canDeleteNote: n => false
     }
 };
+
+export const Playhead: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 60,
+        maxPitch: 72
+    },
+    play: async({ canvasElement }) => {
+        const editor = canvasElement.children.item(0) as ClipEditor;
+        const clock = new Clock();
+        const metronome = clock.addChild(new Metronome(120)) as Metronome;
+        const midiOut = new MidiBus();
+        const clipPlayer = clock.addChild(new ClipPlayer(editor.clip, metronome, midiOut)) as ClipPlayer;
+        clipPlayer.beatCount = editor.clip.duration;
+        clock.addChild(editor.addPlayhead(clipPlayer));
+        clock.start();
+    }
+}
