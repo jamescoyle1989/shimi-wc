@@ -135,6 +135,14 @@ export class ClipEditor extends LitElement {
     }
 
     @property({attribute: false})
+    get customPitchNames(): Map<number, string> { return this._viewModel.customPitchNames; }
+    set customPitchNames(value: Map<number, string>) {
+        const oldValue = this._viewModel.customPitchNames;
+        this._viewModel.customPitchNames = value;
+        this.requestUpdate('customPitchNames', oldValue);
+    }
+
+    @property({attribute: false})
     get noteColor(): (note: ClipNote, isSelected: boolean) => string { return this._viewModel.noteColor; }
     set noteColor(value: (note: ClipNote, isSelected: boolean) => string) {
         const oldValue = this._viewModel.noteColor;
@@ -339,13 +347,15 @@ export class ClipEditor extends LitElement {
                   y=${(vm.getYFromPitch(pitch) + vm.pitchHeight) - (vm.pitchHeight / 5)}
                   style=${styleMap(textStyle)}
                   class="pitch-label">
-                ${vm.scale.getPitchName(pitch, true)}
+                ${vm.getPitchName(pitch)}
             </text>`;
         }
 
         for (const line of vm.getBeatLines().filter(x => x.beat == 0 || x.class == 'bar-line')) {
-            for (const root of vm.pitches.filter(x => (x % 12) == (vm.scale.root % 12) && x != this._highlightedPitch))
-                output.push(renderPitchNameAt(line, root));
+            if (!vm.customPitchNames) {
+                for (const root of vm.pitches.filter(x => (x % 12) == (vm.scale.root % 12) && x != this._highlightedPitch))
+                    output.push(renderPitchNameAt(line, root));
+            }
 
             if (this._highlightedPitch >= 0)
                 output.push(renderPitchNameAt(line, this._highlightedPitch));

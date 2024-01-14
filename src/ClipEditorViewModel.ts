@@ -59,14 +59,30 @@ export class ClipEditorViewModel {
         this._filterPitchesByScale = value;
         this._pitchesCache = null;
     }
+
+    private _customPitchNames: Map<number, string> = null;
+    get customPitchNames(): Map<number, string> { return this._customPitchNames; }
+    set customPitchNames(value: Map<number, string>) {
+        if (value == this._customPitchNames)
+            return;
+        this._customPitchNames = value;
+        this._pitchesCache = null;
+    }
     
     private _pitchesCache: Array<number> | null = null;
     get pitches(): Array<number> {
         if (this._pitchesCache == null) {
             const output = [];
-            for (let i = this.maxPitch; i >= this.minPitch; i--) {
-                if (!this.filterPitchesByScale || this.scale.contains(i))
-                    output.push(i);
+            if (!!this.customPitchNames) {
+                for (const pitch of this.customPitchNames.keys())
+                    output.push(pitch);
+                output.sort((a, b) => b - a);
+            }
+            else {
+                for (let i = this.maxPitch; i >= this.minPitch; i--) {
+                    if (!this.filterPitchesByScale || this.scale.contains(i))
+                        output.push(i);
+                }
             }
             this._pitchesCache = output;
         }
@@ -120,6 +136,12 @@ export class ClipEditorViewModel {
     pitchIsBlack(pitch: number): boolean {
         const m = pitch % 12;
         return m == 1 || m == 3 || m == 6 || m == 8 || m == 10;
+    }
+
+    getPitchName(pitch: number): string {
+        if (!!this.customPitchNames)
+            return this.customPitchNames.get(pitch) ?? '';
+        return this.scale.getPitchName(pitch, true);
     }
 
     getXFromBeat(beat: number): number {

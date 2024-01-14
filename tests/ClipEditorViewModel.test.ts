@@ -67,6 +67,16 @@ test('pitches recalculates after scale change if filtering by scale', () => {
     expect(model.pitches[0]).toBe(126);
 });
 
+test('pitches recalculates after customPitchNames change', () => {
+    const model = new ClipEditorViewModel();
+    expect(model.pitches.length).toBe(128);
+
+    model.customPitchNames = new Map<number, string>().set(12, 'hello');
+
+    expect(model.pitches.length).toBe(1);
+    expect(model.pitches[0]).toBe(12);
+});
+
 test('noteColor by default returns same base color for each note in channel', () => {
     const model = new ClipEditorViewModel();
 
@@ -422,4 +432,27 @@ test('set totalHeight updates yZoom', () => {
     
     expect(model.pitchHeight).toBe(5);
     expect(model.yZoom).toBe(0.25);
+});
+
+test('getPitchName by default returns current scale pitch name', () => {
+    const model = new ClipEditorViewModel();
+    model.clip = new Clip(4);
+    model.scale = ScaleTemplate.major.create(Math.floor(Math.random() * 12));
+
+    expect(model.getPitchName(15)).toBe(model.scale.getPitchName(15, true));
+    expect(model.getPitchName(17)).toBe(model.scale.getPitchName(17, true));
+    expect(model.getPitchName(19)).toBe(model.scale.getPitchName(19, true));
+});
+
+test('getPitchName uses customPitchNames if set', () => {
+    const model = new ClipEditorViewModel();
+    model.clip = new Clip(4);
+    model.scale = ScaleTemplate.major.create(4);
+    model.filterPitchesByScale = true;
+    model.customPitchNames = new Map<number, string>()
+        .set(0, 'abc').set(15, 'def');
+
+    expect(model.getPitchName(0)).toBe('abc');
+    expect(model.getPitchName(15)).toBe('def');
+    expect(model.getPitchName(16)).toBe('');
 });

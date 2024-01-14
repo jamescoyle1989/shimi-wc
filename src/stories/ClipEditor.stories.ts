@@ -65,6 +65,10 @@ const meta: Meta<ClipEditor> = {
             control: 'boolean',
             description: 'If true, then only pitches which belong to the currently set scale will be rendered. Other pitches, as well as any notes on those pitches, won\'t be rendered.'
         },
+        customPitchNames: {
+            control: 'none',
+            description: 'A Map<number, string> object that maps pitch numbers to pitch names'
+        },
         noteColor: {
             control: 'none',
             description: 'Function that takes in a shimi.ClipNote object & boolean flag representing whether that note is selected, and returns a string color value.'
@@ -201,6 +205,19 @@ export const FilterPitchesByScale: Story = {
         maxPitch: 79,
         scale: ScaleTemplate.major.create('G'),
         filterPitchesByScale: true
+    }
+};
+
+export const CustomPitchNaming: Story = {
+    args: {
+        clip: twinkleTwinkle(),
+        minPitch: 24,
+        maxPitch: 35,
+        customPitchNames: new Map<number, string>()
+            .set(24, 'A').set(25, 'B').set(26, 'C')
+            .set(27, 'D').set(28, 'E').set(29, 'F')
+            .set(30, 'G').set(31, 'H').set(32, 'I')
+            .set(33, 'J').set(34, 'K').set(35, 'L')
     }
 };
 
