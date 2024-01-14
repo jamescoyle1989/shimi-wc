@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { withActions } from '@storybook/addon-actions/decorator';
 import { ScalePicker } from '../scale-picker';
 import { ScaleTemplate } from 'shimi';
 
@@ -22,8 +21,7 @@ const meta: Meta<ScalePicker> = {
         actions: {
             handles: ['scale-change']
         }
-    },
-    decorators: [withActions]
+    }
 };
 export default meta;
 

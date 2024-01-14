@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { withActions } from '@storybook/addon-actions/decorator';
 import { OutPortPicker } from '../out-port-picker';
 import { newMockMidiAccess } from './Mocks';
 
@@ -33,8 +32,7 @@ const meta: Meta<OutPortPicker> = {
         actions: {
             handles: ['port-change']
         }
-    },
-    decorators: [withActions]
+    }
 };
 export default meta;
 
