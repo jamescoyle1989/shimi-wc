@@ -149,7 +149,7 @@ export class ClipEditorViewModel {
     }
 
     getBeatFromX(x: number): number {
-        return Math.min(this.clip?.duration ?? 0, Math.max(0, x / this.beatWidth));
+        return Math.min(this.clipBeats, Math.max(0, x / this.beatWidth));
     }
 
     getYFromPitch(pitch: number): number {
