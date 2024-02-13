@@ -181,17 +181,17 @@ test('pitchHeight is 20 * yZoom', () => {
     expect(model.pitchHeight).toBe(34);
 });
 
-test('clipBeats is zero if no clip set', () => {
+test('totalBeats is zero if no clip set', () => {
     const model = new ClipEditorViewModel();
     
-    expect(model.clipBeats).toBe(0);
+    expect(model.totalBeats).toBe(0);
 });
 
-test('clipBeats returns clip duration if set', () => {
+test('totalBeats returns clip duration if set', () => {
     const model = new ClipEditorViewModel();
     model.clip = new Clip(9.5);
 
-    expect(model.clipBeats).toBe(9.5);
+    expect(model.totalBeats).toBe(9.5);
 });
 
 test('beatsPerDivision is inverse of divisionsPerBeat', () => {
@@ -207,7 +207,7 @@ test('totalWidth is 0 if no clip set', () => {
     expect(model.totalWidth).toBe(0);
 });
 
-test('totalWidth is clipBeats * beatWidth', () => {
+test('totalWidth is totalBeats * beatWidth', () => {
     const model = new ClipEditorViewModel();
     model.clip = new Clip(8);
 

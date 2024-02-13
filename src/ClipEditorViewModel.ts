@@ -107,19 +107,15 @@ export class ClipEditorViewModel {
     get pitchHeight(): number { return 20 * this.yZoom; }
     set pitchHeight(value: number) { this.yZoom = value / 20; }
 
-    get clipBeats(): number { return this.clip?.duration ?? 0; }
+    get totalBeats(): number { return this.clip?.duration ?? 0; }
 
     get beatsPerDivision(): number { return 1 / this.divisionsPerBeat; }
 
-    get totalWidth(): number {
-        if (!this.clip)
-            return 0;
-        return this.clipBeats * this.beatWidth;
-    }
+    get totalWidth(): number { return this.totalBeats * this.beatWidth; }
     set totalWidth(value: number) {
-        if (!this.clip || this.clip.duration <= 0)
+        if (this.totalBeats <= 0)
             return;
-        this.beatWidth = value / this.clipBeats;
+        this.beatWidth = value / this.totalBeats;
     }
 
     get totalHeight(): number {
@@ -149,7 +145,7 @@ export class ClipEditorViewModel {
     }
 
     getBeatFromX(x: number): number {
-        return Math.min(this.clipBeats, Math.max(0, x / this.beatWidth));
+        return Math.min(this.totalBeats, Math.max(0, x / this.beatWidth));
     }
 
     getYFromPitch(pitch: number): number {
@@ -173,10 +169,10 @@ export class ClipEditorViewModel {
         }
 
         const output = [];
-        for (let barStart = 0; barStart < this.clipBeats; barStart += this.beatsPerBar) {
+        for (let barStart = 0; barStart < this.totalBeats; barStart += this.beatsPerBar) {
             for (const line of linesPerBar) {
                 const lineBeat = barStart + line.beat;
-                if (lineBeat >= 0 && lineBeat <= this.clipBeats)
+                if (lineBeat >= 0 && lineBeat <= this.totalBeats)
                     output.push({ beat: lineBeat, class: line.class });
             }
         }
