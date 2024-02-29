@@ -108,7 +108,8 @@ export class ChordProgressionEditor extends LitElement {
     render() {
         const vm = this._viewModel;
         return html`
-            <svg :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
+            <svg xmlns="http://www.w3.org/2000/svg"
+                :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
                 preserveAspectRatio="none" file="#666666"
                 ${ref(this._svg)} class="edit-area"
                 width=${vm.totalWidth}
@@ -120,6 +121,7 @@ export class ChordProgressionEditor extends LitElement {
                     fill="#666"></rect>
 
                 ${this._renderBeatLines()}
+                ${this._renderChords()}
             </svg>
         `;
     }
@@ -132,6 +134,29 @@ export class ChordProgressionEditor extends LitElement {
                 <line x1=${line.beat * vm.beatWidth} y1="0" 
                     x2=${line.beat * vm.beatWidth} y2=${vm.totalHeight}
                     class=${line.class}/>
+            `);
+        }
+        return output;
+    }
+
+    private _renderChords(): Array<TemplateResult> {
+        const vm = this._viewModel;
+        const output: Array<TemplateResult> = [];
+        for (const chord of vm.chordProgression?.chords ?? []) {
+            output.push(svg`
+                <rect x=${chord.start * vm.beatWidth} y="0"
+                        width=${chord.duration * vm.beatWidth} height=${vm.totalHeight}
+                        stroke="black" stroke-width="0.5" fill="#FF888888">
+                </rect>
+            `);
+            output.push(svg`
+                <foreignObject x=${(chord.start * vm.beatWidth) + 20} y="20"
+                        width=${Math.min(100, (chord.duration * vm.beatWidth) - 40)}
+                        height="50">
+                    <input xmlns="http://www.w3.org/1999/xhtml"
+                            type="text" value=${chord.chord.name}>
+                    </input>
+                </foreignObject>
             `);
         }
         return output;

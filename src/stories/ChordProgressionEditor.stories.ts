@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { ChordProgressionEditor } from '../chord-progression-editor';
-import { ChordFinder, ChordProgression } from 'shimi';
+import { Chord, ChordFinder, ChordProgression, ScaleTemplate } from 'shimi';
 
 
 const meta: Meta<ChordProgressionEditor> = {
@@ -53,14 +53,24 @@ const meta: Meta<ChordProgressionEditor> = {
 };
 export default meta;
 
+const scale = ScaleTemplate.major.create('C');
+const chordFinder = new ChordFinder().withDefaultChordLookups();
+Chord.nameGenerator = chord => {
+    const result = chordFinder.findChord(chord.pitches, chord.root, null, scale);
+    if (result == null)
+        return null;
+    return result.name
+        .replace('{r}', scale.getPitchName(result.root))
+        .replace('{r}', scale.getPitchName(result.bass));
+};
 
 function oneFiveSixFour(): ChordProgression {
-    const chordFinder = new ChordFinder().withDefaultChordLookups();
-    return new ChordProgression(16)
+    const output = new ChordProgression(16)
         .addChord(0, 4, chordFinder.newChord('C'))
         .addChord(4, 4, chordFinder.newChord('G'))
         .addChord(8, 4, chordFinder.newChord('Am'))
         .addChord(12, 4, chordFinder.newChord('F'));
+    return output;
 }
 
 
