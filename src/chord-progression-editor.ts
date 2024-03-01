@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
 import { ChordProgressionEditorViewModel } from './ChordProgressionEditorViewModel';
 import { ChordProgression, Scale } from 'shimi';
+import { ChordProgressionEditorBehavior } from './ChordProgressionEditorBehavior';
 
 /** Contains attributes and rendering logic */
 @customElement('chord-progression-editor')
@@ -10,8 +11,11 @@ export class ChordProgressionEditor extends LitElement {
 
     private _viewModel: ChordProgressionEditorViewModel = new ChordProgressionEditorViewModel();
 
+    private _behavior: ChordProgressionEditorBehavior;
+
     constructor() {
         super();
+        this._behavior = new ChordProgressionEditorBehavior(this, this._viewModel);
     }
 
     @property({attribute: false})
@@ -100,6 +104,10 @@ export class ChordProgressionEditor extends LitElement {
         return point.matrixTransform(svg.getScreenCTM().inverse());
     }
 
+    private _onDoubleClick(evt: MouseEvent): void {
+        this._behavior.onDoubleClick(this._getCursorPoint(evt));
+    }
+
     firstUpdated() {
         const svg: any = this._svg.value;
         this._svgPoint = svg.createSVGPoint();
@@ -112,6 +120,7 @@ export class ChordProgressionEditor extends LitElement {
                 :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
                 preserveAspectRatio="none" file="#666666"
                 ${ref(this._svg)} class="edit-area"
+                @dblclick=${this._onDoubleClick}
                 width=${vm.totalWidth}
                 height=${vm.totalHeight}>
 
@@ -150,8 +159,8 @@ export class ChordProgressionEditor extends LitElement {
                 </rect>
             `);
             output.push(svg`
-                <foreignObject x=${(chord.start * vm.beatWidth) + 20} y="20"
-                        width=${Math.min(100, (chord.duration * vm.beatWidth) - 40)}
+                <foreignObject x=${chord.start * vm.beatWidth} y="20"
+                        width=${Math.min(100, chord.duration * vm.beatWidth)}
                         height="50">
                     <input xmlns="http://www.w3.org/1999/xhtml"
                             type="text" value=${chord.chord.name}>
