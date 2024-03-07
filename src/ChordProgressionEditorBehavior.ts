@@ -1,3 +1,4 @@
+import { ChordProgressionChord } from 'shimi';
 import { ChordProgressionEditorViewModel } from './ChordProgressionEditorViewModel';
 import { ChordProgressionEditor } from './chord-progression-editor';
 
@@ -40,6 +41,36 @@ export class ChordProgressionEditorBehavior {
             );
             currentChord.end = snappedBeat;
         }
+        this._chordProgressionEditor.requestUpdate();
+    }
+
+
+    onChordNameChanged(chord: ChordProgressionChord, newName: string): void {
+        const vm = this._viewModel;
+
+        if (newName == '') {
+            vm.chordsIncorrectlyModified.delete(chord);
+            vm.chordProgression.removeChords(x => x === chord);
+            this._chordProgressionEditor.requestUpdate();
+            return;
+        }
+
+        const newChord = vm.chordFinder.newChord(newName);
+        if (!!newChord) {
+            chord.chord = newChord;
+            vm.chordsIncorrectlyModified.delete(chord);
+        }
+        else {
+            vm.chordsIncorrectlyModified.add(chord);
+        }
+        this._chordProgressionEditor.requestUpdate();
+    }
+
+
+    onChordAdded(chord: ChordProgressionChord): void {
+        const vm = this._viewModel;
+
+        vm.chordProgression.addChord(chord.start, chord.duration, chord.chord);
         this._chordProgressionEditor.requestUpdate();
     }
 }

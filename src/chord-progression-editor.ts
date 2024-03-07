@@ -2,7 +2,7 @@ import { LitElement, TemplateResult, css, html, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
 import { ChordProgressionEditorViewModel } from './ChordProgressionEditorViewModel';
-import { ChordProgression, Scale } from 'shimi';
+import { ChordFinder, ChordProgression, Scale, ChordProgressionChord } from 'shimi';
 import { ChordProgressionEditorBehavior } from './ChordProgressionEditorBehavior';
 
 /** Contains attributes and rendering logic */
@@ -24,6 +24,14 @@ export class ChordProgressionEditor extends LitElement {
         const oldValue = this._viewModel.chordProgression;
         this._viewModel.chordProgression = value;
         this.requestUpdate('chordProgression', oldValue);
+    }
+
+    @property({attribute: false})
+    get chordFinder(): ChordFinder { return this._viewModel.chordFinder; }
+    set chordFinder(value: ChordFinder) {
+        const oldValue = this._viewModel.chordFinder;
+        this._viewModel.chordFinder = value;
+        this.requestUpdate('chordFinder', oldValue);
     }
 
     @property({attribute: 'x-zoom', type: Number})
@@ -131,6 +139,7 @@ export class ChordProgressionEditor extends LitElement {
 
                 ${this._renderBeatLines()}
                 ${this._renderChords()}
+                ${this._renderChordGaps()}
             </svg>
         `;
     }
@@ -148,23 +157,50 @@ export class ChordProgressionEditor extends LitElement {
         return output;
     }
 
+    private _getChordColor(chord: ChordProgressionChord): string {
+        const vm = this._viewModel;
+        if (vm.chordsIncorrectlyModified.has(chord))
+            return '#FF888888';
+        return '#88FF8888';
+    }
+
     private _renderChords(): Array<TemplateResult> {
         const vm = this._viewModel;
+        const behavior = this._behavior;
         const output: Array<TemplateResult> = [];
         for (const chord of vm.chordProgression?.chords ?? []) {
             output.push(svg`
                 <rect x=${chord.start * vm.beatWidth} y="0"
                         width=${chord.duration * vm.beatWidth} height=${vm.totalHeight}
-                        stroke="black" stroke-width="0.5" fill="#FF888888">
+                        stroke="black" stroke-width="0.5" fill=${this._getChordColor(chord)}>
                 </rect>
+                <text x=${(chord.start * vm.beatWidth) + 5} y="60">${vm.getChordNoteNamesLabel(chord)}</text>
             `);
             output.push(svg`
                 <foreignObject x=${chord.start * vm.beatWidth} y="20"
                         width=${Math.min(100, chord.duration * vm.beatWidth)}
                         height="50">
                     <input xmlns="http://www.w3.org/1999/xhtml"
-                            type="text" value=${chord.chord.name}>
+                            type="text" value=${chord.chord.name}
+                            @change=${e => behavior.onChordNameChanged(chord, e.target.value)}>
                     </input>
+                </foreignObject>
+            `);
+        }
+        return output;
+    }
+
+    private _renderChordGaps(): Array<TemplateResult> {
+        const vm = this._viewModel;
+        const behavior = this._behavior;
+        const output: Array<TemplateResult> = [];
+        for (const nonChord of vm.getChordGaps()) {
+            output.push(svg`
+                <foreignObject x=${nonChord.start * vm.beatWidth} y="20"
+                        width=${Math.min(100, nonChord.duration * vm.beatWidth)}
+                        height="50">
+                    <button xmlns="http://www.w3.org/1999/xhtml"
+                        @click=${e => behavior.onChordAdded(nonChord)}>Add</button>
                 </foreignObject>
             `);
         }
