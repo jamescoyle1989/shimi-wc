@@ -82,6 +82,17 @@ export class ChordProgressionEditor extends LitElement {
         this.requestUpdate('divisionsPerBeat', oldValue);
     }
 
+    @property({attribute: 'max-beats-per-line', type: Number, reflect: true})
+    get maxBeatsPerLine(): number { return this._viewModel.maxBeatsPerLine; }
+    set maxBeatsPerLine(value: number) {
+        const oldValue = this._viewModel.maxBeatsPerLine;
+        let newValue = Math.round(value);
+        if (newValue <= 0)
+            newValue = -1;
+        this._viewModel.maxBeatsPerLine = newValue;
+        this.requestUpdate('maxBeatsPerLine', oldValue);
+    }
+
     @property({attribute: 'snap-strength', type: Number, reflect: true})
     get snapStrength(): number { return this._viewModel.snapStrength; }
     set snapStrength(value: number) {
@@ -126,17 +137,13 @@ export class ChordProgressionEditor extends LitElement {
         return html`
             <svg xmlns="http://www.w3.org/2000/svg"
                 :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
-                preserveAspectRatio="none" file="#666666"
+                preserveAspectRatio="none"
                 ${ref(this._svg)} class="edit-area"
                 @dblclick=${this._onDoubleClick}
                 width=${vm.totalWidth}
                 height=${vm.totalHeight}>
 
-                <rect x="0" y="0"
-                    width=${vm.totalWidth}
-                    height=${vm.totalHeight}
-                    fill="#666"></rect>
-
+                ${this._renderRows()}
                 ${this._renderBeatLines()}
                 ${this._renderChords()}
                 ${this._renderChordGaps()}
@@ -144,13 +151,32 @@ export class ChordProgressionEditor extends LitElement {
         `;
     }
 
+    private _renderRows(): Array<TemplateResult> {
+        const vm = this._viewModel;
+        const rowCount = vm.lineCount;
+        const output: Array<TemplateResult> = [];
+        for (let row = 0; row < rowCount; row++) {
+            const rowStartBeat = row * vm.beatsPerLine;
+            const beatsInRow = Math.min(vm.totalBeats - rowStartBeat, vm.beatsPerLine);
+            output.push(svg`
+                <rect x="0" y=${row * (vm.chordHeight + vm.lineBufferHeight)}
+                    width=${beatsInRow * vm.beatWidth}
+                    height=${vm.chordHeight}
+                    fill="#666"></rect>
+            `);
+        }
+        return output;
+    }
+
     private _renderBeatLines(): Array<TemplateResult> {
         const vm = this._viewModel;
         const output: Array<TemplateResult> = [];
         for (const line of vm.getBeatLines()) {
+            const beatX = vm.getXFromBeat(line.beat);
+            const beatY = vm.getYFromBeat(line.beat);
             output.push(svg`
-                <line x1=${line.beat * vm.beatWidth} y1="0" 
-                    x2=${line.beat * vm.beatWidth} y2=${vm.totalHeight}
+                <line x1=${beatX} y1=${beatY}
+                    x2=${beatX} y2=${beatY + vm.chordHeight}
                     class=${line.class}/>
             `);
         }
@@ -169,23 +195,31 @@ export class ChordProgressionEditor extends LitElement {
         const behavior = this._behavior;
         const output: Array<TemplateResult> = [];
         for (const chord of vm.chordProgression?.chords ?? []) {
-            output.push(svg`
-                <rect x=${chord.start * vm.beatWidth} y="0"
-                        width=${chord.duration * vm.beatWidth} height=${vm.totalHeight}
-                        stroke="black" stroke-width="0.5" fill=${this._getChordColor(chord)}>
-                </rect>
-                <text x=${(chord.start * vm.beatWidth) + 5} y="60">${vm.getChordNoteNamesLabel(chord)}</text>
-            `);
-            output.push(svg`
-                <foreignObject x=${chord.start * vm.beatWidth} y="20"
-                        width=${Math.min(100, chord.duration * vm.beatWidth)}
-                        height="50">
-                    <input xmlns="http://www.w3.org/1999/xhtml"
-                            type="text" value=${chord.chord.name}
-                            @change=${e => behavior.onChordNameChanged(chord, e.target.value)}>
-                    </input>
-                </foreignObject>
-            `);
+            const chordSections = vm.getChordLineSectionBeats(chord);
+            for (let i = 0; i < chordSections.length; i++) {
+                const chordSection = chordSections[i];
+                const chordX = vm.getXFromBeat(chordSection.start);
+                const chordY = vm.getYFromBeat(chordSection.start);
+                output.push(svg`
+                    <rect x=${chordX} y=${chordY}
+                            width=${(chordSection.end - chordSection.start) * vm.beatWidth} height=${vm.chordHeight}
+                            stroke="black" stroke-width="0.5" fill=${this._getChordColor(chord)}>
+                    </rect>
+                    <text x=${chordX + 5} y=${chordY + 60}>${vm.getChordNoteNamesLabel(chord)}</text>
+                `);
+                if (i == 0) {
+                    output.push(svg`
+                        <foreignObject x=${chordX} y=${chordY + 20}
+                                width=${Math.min(100, (chordSection.end - chordSection.start) * vm.beatWidth)}
+                                height="50">
+                            <input xmlns="http://www.w3.org/1999/xhtml"
+                                    type="text" value=${chord.chord.name}
+                                    @change=${e => behavior.onChordNameChanged(chord, e.target.value)}>
+                            </input>
+                        </foreignObject>
+                    `);
+                }
+            }
         }
         return output;
     }
@@ -195,8 +229,10 @@ export class ChordProgressionEditor extends LitElement {
         const behavior = this._behavior;
         const output: Array<TemplateResult> = [];
         for (const nonChord of vm.getChordGaps()) {
+            const nonChordX = vm.getXFromBeat(nonChord.start);
+            const nonChordY = vm.getYFromBeat(nonChord.start);
             output.push(svg`
-                <foreignObject x=${nonChord.start * vm.beatWidth} y="20"
+                <foreignObject x=${nonChordX} y=${nonChordY + 20}
                         width=${Math.min(100, nonChord.duration * vm.beatWidth)}
                         height="50">
                     <button xmlns="http://www.w3.org/1999/xhtml"

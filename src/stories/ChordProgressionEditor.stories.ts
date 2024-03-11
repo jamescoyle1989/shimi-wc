@@ -41,6 +41,10 @@ const meta: Meta<ChordProgressionEditor> = {
             control: { type: 'number', min: 1, max: 8, step: 1 },
             description: 'How many subdivisions to render per beat. These provide a useful visual cue where each beat divides, as well as note snapping.'
         },
+        maxBeatsPerLine: {
+            control: { type: 'number', min: -1, max: 16, step: 1 },
+            description: 'How many beats can fit onto a single line before wrapping around to a new one.'
+        },
         snapStrength: {
             control: { type: 'number', min: 0, max: 1, step: 0.01 },
             description: 'How strongly note starts & ends will snap to beat divisions. Default value = 0.05, meaning that given the distance from one beat division to the next, a note start or end must be within 5% of that distance from the division to snap to it.'
@@ -79,5 +83,12 @@ type Story = StoryObj<ChordProgressionEditor>;
 export const Primary: Story = {
     args: {
         chordProgression: oneFiveSixFour()
+    }
+};
+
+export const SplitOverMultipleLines: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        maxBeatsPerLine: 8
     }
 };

@@ -19,7 +19,7 @@ export class ChordProgressionEditorBehavior {
 
     onDoubleClick(cartesian: {x: number, y: number}): void {
         const vm = this._viewModel;
-        const snappedBeat = vm.getSnappedBeat(vm.getBeatFromX(cartesian.x));
+        const snappedBeat = vm.getSnappedBeat(vm.getBeatFromXY(cartesian));
         const chordAtBeat = vm.chordProgression.chords.find(x => x.start == snappedBeat);
 
         if (!!chordAtBeat) {

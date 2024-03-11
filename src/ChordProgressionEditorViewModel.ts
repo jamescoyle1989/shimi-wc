@@ -14,6 +14,10 @@ export class ChordProgressionEditorViewModel {
 
     divisionsPerBeat: number = 2;
 
+    maxBeatsPerLine: number = -1;
+
+    lineBufferHeight: number = 20;
+
     //0.05 = that given the number of beats from one division to the next, we need to be within 5% of that distance from a division line to snap to it
     snapStrength: number = 0.05;
 
@@ -22,32 +26,65 @@ export class ChordProgressionEditorViewModel {
     get beatWidth(): number { return 100 * this.xZoom; }
     set beatWidth(value: number) { this.xZoom = value / 100; }
 
-    get chordHeight(): number { return 200 * this.yZoom; }
-    set chordHeight(value: number) { this.yZoom = value / 200; }
+    get chordHeight(): number { return 100 * this.yZoom; }
+    set chordHeight(value: number) { this.yZoom = value / 100; }
 
     get totalBeats(): number { return this.chordProgression?.duration ?? 0; }
 
     get beatsPerDivision(): number { return 1 / this.divisionsPerBeat; }
 
-    get totalWidth(): number { return this.totalBeats * this.beatWidth; }
-    set totalWidth(value: number) {
-        if (this.totalBeats <= 0)
-            return;
-        this.beatWidth = value / this.totalBeats;
+    get beatsPerLine(): number {
+        if (this.maxBeatsPerLine <= 0)
+            return this.totalBeats;
+        return Math.min(this.totalBeats, this.maxBeatsPerLine);
     }
 
-    get totalHeight(): number { return this.chordHeight; }
+    get totalWidth(): number { return this.beatsPerLine * this.beatWidth; }
+    set totalWidth(value: number) {
+        const divisor = this.beatsPerLine;
+        if (divisor <= 0)
+            return;
+        this.beatWidth = value / divisor;
+    }
+
+    get lineCount(): number {
+        if (this.maxBeatsPerLine <= 0)
+            return 1;
+        return Math.ceil(this.totalBeats / this.maxBeatsPerLine);
+    }
+
+    get totalHeight(): number {
+        return (this.chordHeight * this.lineCount) + (this.lineBufferHeight * (this.lineCount - 1));
+    }
     set totalHeight(value: number) {
         this.chordHeight = value;
     }
 
 
     getXFromBeat(beat: number): number {
+        if (this.maxBeatsPerLine > 0)
+            beat = beat % this.maxBeatsPerLine;
         return beat * this.beatWidth;
     }
 
-    getBeatFromX(x: number): number {
-        return Math.min(Math.max(0, x / this.beatWidth), this.totalBeats);
+    getYFromBeat(beat: number): number {
+        if (this.totalBeats <= this.beatsPerLine)
+            return 0;
+        const line = Math.floor(beat / this.beatsPerLine);
+        return line * (this.chordHeight + this.lineBufferHeight);
+    }
+
+    getBeatFromXY(cartesian: {x: number, y: number}): number {
+        const line = Math.floor(cartesian.y / (this.chordHeight + this.lineBufferHeight));
+        const positionInLine = cartesian.y - (line * (this.chordHeight + this.lineBufferHeight));
+        if (positionInLine > this.chordHeight)
+            return -1;
+        
+        const beatInLine = Math.min(
+            Math.max(0, cartesian.x / this.beatWidth),
+            this.beatsPerLine
+        );
+        return beatInLine + (line * this.beatsPerLine);
     }
 
     getBeatLines(): Array<{beat: number, class: string}> {
@@ -109,7 +146,7 @@ export class ChordProgressionEditorViewModel {
         const orderedChords = this.chordProgression.chords.sort((a, b) => a.start - b.start);
         const output = new Array<ChordProgressionChord>();
         if (orderedChords.length == 0) {
-            output.push(new ChordProgressionChord(0, this.chordProgression.duration, new Chord()));
+            output.push(new ChordProgressionChord(0, this.totalBeats, new Chord()));
         }
         else {
             if (orderedChords[0].start > 0)
@@ -121,8 +158,27 @@ export class ChordProgressionEditorViewModel {
                     output.push(new ChordProgressionChord(prevChord.end, nextChord.start - prevChord.end, new Chord()));
             }
             const lastChord = orderedChords[orderedChords.length - 1];
-            if (lastChord.end < this.chordProgression.duration)
-                output.push(new ChordProgressionChord(lastChord.end, this.chordProgression.duration - lastChord.end, new Chord()));
+            if (lastChord.end < this.totalBeats)
+                output.push(new ChordProgressionChord(lastChord.end, this.totalBeats - lastChord.end, new Chord()));
+        }
+        return output;
+    }
+
+    /**
+     * Given a chord, returns the beat sections which would need to be separately rendered due to line wrapping
+     */
+    getChordLineSectionBeats(chord: ChordProgressionChord): Array<{start: number, end: number}> {
+        const output: Array<{start: number, end: number}> = [];
+        let start = chord.start;
+        while (true) {
+            const startLine = Math.floor(start / this.beatsPerLine);
+            const nextLineBeat = (startLine + 1) * this.beatsPerLine;
+            if (nextLineBeat >= this.totalBeats || nextLineBeat >= chord.end) {
+                output.push({start, end: chord.end});
+                break;
+            }
+            output.push({start, end: nextLineBeat});
+            start = nextLineBeat;
         }
         return output;
     }
