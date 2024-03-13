@@ -1,9 +1,10 @@
 import { LitElement, TemplateResult, css, html, svg } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { Ref, createRef, ref } from 'lit/directives/ref.js';
 import { ChordProgressionEditorViewModel } from './ChordProgressionEditorViewModel';
-import { ChordFinder, ChordProgression, Scale, ChordProgressionChord } from 'shimi';
+import { ChordFinder, ChordProgression, Scale, ChordProgressionChord, ChordProgressionPlayer } from 'shimi';
 import { ChordProgressionEditorBehavior } from './ChordProgressionEditorBehavior';
+import { ChordProgressionEditorPlayhead } from './ChordProgressionEditorPlayhead';
 
 /** Contains attributes and rendering logic */
 @customElement('chord-progression-editor')
@@ -109,6 +110,9 @@ export class ChordProgressionEditor extends LitElement {
         this.requestUpdate('scale', oldValue);
     }
 
+    @state()
+    private _playheadUpdateTicker: number = 0;
+
     private _svg: Ref<SVGElement> = createRef();
 
     private _svgPoint: SVGPoint | null = null;
@@ -125,6 +129,19 @@ export class ChordProgressionEditor extends LitElement {
 
     private _onDoubleClick(evt: MouseEvent): void {
         this._behavior.onDoubleClick(this._getCursorPoint(evt));
+    }
+
+    addPlayhead(chordProgressionPlayer: ChordProgressionPlayer): ChordProgressionEditorPlayhead {
+        if (chordProgressionPlayer.chordProgression != this.chordProgression)
+            throw Error('Cannot add a playhead for a chord progression player that\'s playing a different progression than the one being edited');
+
+        const output = new ChordProgressionEditorPlayhead(this, chordProgressionPlayer);
+        this._viewModel.playheads.push(output);
+        return output;
+    }
+
+    markPlayheadsForUpdate(): void {
+        this._playheadUpdateTicker = (this._playheadUpdateTicker + 1) % 1000;
     }
 
     firstUpdated() {
@@ -147,6 +164,7 @@ export class ChordProgressionEditor extends LitElement {
                 ${this._renderBeatLines()}
                 ${this._renderChords()}
                 ${this._renderChordGaps()}
+                ${this._renderPlayheads()}
             </svg>
         `;
     }
@@ -243,6 +261,21 @@ export class ChordProgressionEditor extends LitElement {
         return output;
     }
 
+    private _renderPlayheads(): Array<TemplateResult> {
+        const vm = this._viewModel;
+        const output: Array<TemplateResult> = [];
+        for (const playhead of vm.playheads) {
+            const player = playhead.chordProgressionPlayer;
+            const beat = (player.startBeat + player.beatsPassed) % this.chordProgression.duration;
+            const lineX = vm.getXFromBeat(beat);
+            const lineY = vm.getYFromBeat(beat);
+            output.push(svg`
+                <line x1=${lineX} y1=${lineY} x2=${lineX} y2=${lineY + vm.chordHeight} class="playhead"/>
+            `);
+        }
+        return output;
+    }
+
     static styles = css`
         .edit-area {
             user-select: none;
@@ -268,6 +301,11 @@ export class ChordProgressionEditor extends LitElement {
             stroke: #A0A0A0;
             stroke-width: 1;
             stroke-dasharray: 2,5;
+        }
+
+        .playhead {
+            stroke: #F02222;
+            stroke-width: 2;
         }
     `;
 }

@@ -1,4 +1,5 @@
 import { Chord, ChordFinder, ChordProgression, Scale, ScaleTemplate, ChordProgressionChord } from 'shimi';
+import { ChordProgressionEditorPlayhead } from './ChordProgressionEditorPlayhead';
 
 /** Contains values that ChordProgressionEditor properties depend on, as well as helper properties & methods */
 export class ChordProgressionEditorViewModel {
@@ -22,6 +23,8 @@ export class ChordProgressionEditorViewModel {
     snapStrength: number = 0.05;
 
     scale: Scale = ScaleTemplate.major.create('C');
+
+    playheads: Array<ChordProgressionEditorPlayhead> = [];
 
     get beatWidth(): number { return 100 * this.xZoom; }
     set beatWidth(value: number) { this.xZoom = value / 100; }

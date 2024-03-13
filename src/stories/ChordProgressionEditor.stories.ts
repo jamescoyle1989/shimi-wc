@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { ChordProgressionEditor } from '../chord-progression-editor';
-import { Chord, ChordFinder, ChordProgression, ScaleTemplate } from 'shimi';
+import { Chord, ChordFinder, ChordProgression, ChordProgressionPlayer, Clock, Metronome, MidiBus, ScaleTemplate } from 'shimi';
 
 
 const meta: Meta<ChordProgressionEditor> = {
@@ -92,3 +92,18 @@ export const SplitOverMultipleLines: Story = {
         maxBeatsPerLine: 8
     }
 };
+
+export const Playhead: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        maxBeatsPerLine: 8
+    },
+    play: async({ canvasElement }) => {
+        const editor = canvasElement.children.item(0) as ChordProgressionEditor;
+        const clock = new Clock();
+        const metronome = clock.addChild(new Metronome(120)) as Metronome;
+        const player = clock.addChild(new ChordProgressionPlayer(editor.chordProgression, metronome)) as ChordProgressionPlayer;
+        clock.addChild(editor.addPlayhead(player));
+        clock.start();
+    }
+}
