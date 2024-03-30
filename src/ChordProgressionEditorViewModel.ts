@@ -60,7 +60,12 @@ export class ChordProgressionEditorViewModel {
         return (this.chordHeight * this.lineCount) + (this.lineBufferHeight * (this.lineCount - 1));
     }
     set totalHeight(value: number) {
-        this.chordHeight = value;
+        const currentHeight = this.totalHeight;
+        if (currentHeight <= 0)
+            return;
+        const scalar = value / currentHeight;
+        this.chordHeight *= scalar;
+        this.lineBufferHeight *= scalar;
     }
 
 
