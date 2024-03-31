@@ -110,6 +110,14 @@ export class ChordProgressionEditor extends LitElement {
         this.requestUpdate('scale', oldValue);
     }
 
+    @property({attribute: false})
+    get chordColor(): (chord: ChordProgressionChord, isValid: boolean) => string { return this._viewModel.chordColor; }
+    set chordColor(value: (chord: ChordProgressionChord, isValid: boolean) => string) {
+        const oldValue = this._viewModel.chordColor;
+        this._viewModel.chordColor = value;
+        this.requestUpdate('chordColor', oldValue);
+    }
+
     @state()
     private _playheadUpdateTicker: number = 0;
 
@@ -203,9 +211,8 @@ export class ChordProgressionEditor extends LitElement {
 
     private _getChordColor(chord: ChordProgressionChord): string {
         const vm = this._viewModel;
-        if (vm.chordsIncorrectlyModified.has(chord))
-            return '#FF888888';
-        return '#88FF8888';
+        const isValid = !vm.chordsIncorrectlyModified.has(chord);
+        return vm.chordColor(chord, isValid);
     }
 
     private _renderChords(): Array<TemplateResult> {

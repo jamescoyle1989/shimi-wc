@@ -26,6 +26,10 @@ export class ChordProgressionEditorViewModel {
 
     playheads: Array<ChordProgressionEditorPlayhead> = [];
 
+    chordColor: (chord: ChordProgressionChord, isValid: boolean) => string = (c, valid) => {
+        return valid ? '#88FF8888' : '#FF888888';
+    }
+
     get beatWidth(): number { return 100 * this.xZoom; }
     set beatWidth(value: number) { this.xZoom = value / 100; }
 

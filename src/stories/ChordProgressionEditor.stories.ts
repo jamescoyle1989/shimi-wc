@@ -52,6 +52,10 @@ const meta: Meta<ChordProgressionEditor> = {
         scale: {
             control: 'none',
             description: 'The scale object to use when looking up relative chord names.'
+        },
+        chordColor: {
+            control: 'none',
+            description: 'Function that takes a ChordProgressionChord and boolean of whether it\'s valid. Returns color as string.'
         }
     }
 };
@@ -105,5 +109,23 @@ export const Playhead: Story = {
         const player = clock.addChild(new ChordProgressionPlayer(editor.chordProgression, metronome)) as ChordProgressionPlayer;
         clock.addChild(editor.addPlayhead(player));
         clock.start();
+    }
+}
+
+export const MultipleColors: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        xZoom: 0.5,
+        chordColor: (chord, isValid) => {
+            if (!isValid)
+                return '#FF888888';
+            if (chord.start < 4)
+                return '#FFFF8888';
+            if (chord.start < 8)
+                return '#88FF8888';
+            if (chord.start < 12)
+                return '#88FFFF88';
+            return '#8888FF88';
+        }
     }
 }
