@@ -1,6 +1,7 @@
 import { ChordProgressionChord } from 'shimi';
 import { ChordProgressionEditorViewModel } from './ChordProgressionEditorViewModel';
 import { ChordProgressionEditor } from './chord-progression-editor';
+import { dragModes } from './ClipEditorBehavior';
 
 export class ChordProgressionEditorBehavior {
     private _chordProgressionEditor: ChordProgressionEditor;
@@ -16,6 +17,64 @@ export class ChordProgressionEditorBehavior {
     }
 
 
+
+    onMouseDown(cartesian: {x: number, y: number}, button: number): void {
+        const vm = this._viewModel;
+        if (!vm.chordProgression)
+            return;
+        const beat = vm.getBeatFromXY(cartesian);
+        const existingChord = vm.chordProgression.getChordAt(beat);
+        if (!existingChord)
+            return;
+        this._beginChordDrag(existingChord, beat);
+    }
+
+    onMouseMove(cartesian: {x: number, y: number}): void {
+        const vm = this._viewModel;
+        if (!vm.chordProgression || this._dragMode == dragModes.none || !this._draggedChord)
+            return;
+
+        const dragChordStart = (this._dragMode & dragModes.noteStart) > 0;
+        const dragChordEnd = (this._dragMode & dragModes.noteEnd) > 0;
+
+        const newDragBeat = vm.getSnappedBeat(vm.getBeatFromXY(cartesian) - this._dragOffset);
+        if (dragChordStart) {
+            if (newDragBeat < this._draggedChord.end) {
+                const chordEnd = this._draggedChord.end;
+                this._draggedChord.start = newDragBeat;
+                this._draggedChord.end = chordEnd;
+                if (!!this._draggedNeighbourChord)
+                    this._draggedNeighbourChord.end = newDragBeat;
+            }
+        }
+        else if (dragChordEnd) {
+            if (newDragBeat > this._draggedChord.start) {
+                this._draggedChord.end = newDragBeat;
+                if (!!this._draggedNeighbourChord) {
+                    const neighbourEnd = this._draggedNeighbourChord.end;
+                    this._draggedNeighbourChord.start = newDragBeat;
+                    this._draggedNeighbourChord.end = neighbourEnd;
+                }
+            }
+        }
+
+        this._chordProgressionEditor.requestUpdate();
+    }
+
+    onMouseUp(cartesian: {x: number, y: number}, button: number): void {
+        const vm = this._viewModel;
+        if (button == 0) {
+            this._dragMode = dragModes.none;
+            if (!!vm.chordProgression && !!this._draggedChord && this._draggedChord.duration <= 0)
+                vm.chordProgression.chords = vm.chordProgression.chords.filter(c => c !== this._draggedChord);
+            this._draggedChord = null;
+            this._chordProgressionEditor.requestUpdate();
+        }
+    }
+
+    onMouseLeave(cartesian: {x: number, y: number}, button: number): void {
+        this.onMouseUp(cartesian, 0);
+    }
 
     onDoubleClick(cartesian: {x: number, y: number}): void {
         const vm = this._viewModel;
@@ -71,6 +130,40 @@ export class ChordProgressionEditorBehavior {
         const vm = this._viewModel;
 
         vm.chordProgression.addChord(chord.start, chord.duration, chord.chord);
+        this._chordProgressionEditor.requestUpdate();
+    }
+
+
+    private _draggedChord: ChordProgressionChord = null;
+    private _draggedNeighbourChord: ChordProgressionChord = null;
+    private _dragOffset: number = 0;
+    private _dragMode: number = dragModes.none;
+
+    private _beginChordDrag(chord: ChordProgressionChord, beat: number) {
+        const vm = this._viewModel;
+        if (!vm.chordProgression)
+            return;
+        const grabPercent = chord.getPercent(beat);
+        let neighbour: ChordProgressionChord = null;
+
+        if (grabPercent <= vm.chordResizeHandleArea) {
+            this._dragMode = dragModes.noteStart;
+            neighbour = vm.chordProgression.chords.find(x => x.end == chord.start);
+        }
+        else if (grabPercent >= 1 - vm.chordResizeHandleArea) {
+            this._dragMode = dragModes.noteEnd;
+            neighbour = vm.chordProgression.chords.find(x => x.start == chord.end);
+        }
+
+        if (this._dragMode == dragModes.none)
+            return;
+
+        if (this._dragMode == dragModes.noteEnd)
+            this._dragOffset = beat - chord.end;
+        else
+            this._dragOffset = beat - chord.start;
+        this._draggedChord = chord;
+        this._draggedNeighbourChord = neighbour;
         this._chordProgressionEditor.requestUpdate();
     }
 }

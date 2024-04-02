@@ -22,6 +22,9 @@ export class ChordProgressionEditorViewModel {
     //0.05 = that given the number of beats from one division to the next, we need to be within 5% of that distance from a division line to snap to it
     snapStrength: number = 0.05;
 
+    //0.1 = you can grab the inital 10% of a chord to stretch it from the start, or the final 10% of a chord to stretch it from the end
+    chordResizeHandleArea: number = 0.1;
+
     scale: Scale = ScaleTemplate.major.create('C');
 
     playheads: Array<ChordProgressionEditorPlayhead> = [];

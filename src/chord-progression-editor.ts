@@ -102,6 +102,14 @@ export class ChordProgressionEditor extends LitElement {
         this.requestUpdate('snapStrength', oldValue);
     }
 
+    @property({attribute: 'chord-resize-handle-area', type: Number, reflect: true})
+    get chordResizeHandleArea(): number { return this._viewModel.chordResizeHandleArea; }
+    set chordResizeHandleArea(value: number) {
+        const oldValue = this._viewModel.chordResizeHandleArea;
+        this._viewModel.chordResizeHandleArea = Math.min(Math.max(0, value), 1);
+        this.requestUpdate('chordResizeHandleArea', oldValue);
+    }
+
     @property({attribute: false})
     get scale(): Scale { return this._viewModel.scale; }
     set scale(value: Scale) {
@@ -135,6 +143,23 @@ export class ChordProgressionEditor extends LitElement {
         return point.matrixTransform(svg.getScreenCTM().inverse());
     }
 
+    private _onMouseDown(evt: MouseEvent): void {
+        this._behavior.onMouseDown(this._getCursorPoint(evt), evt.button);
+    }
+
+    private _onMouseMove(evt: MouseEvent): void {
+        const cursorPoint = this._getCursorPoint(evt);
+        this._behavior.onMouseMove(cursorPoint);
+    }
+
+    private _onMouseUp(evt: MouseEvent): void {
+        this._behavior.onMouseUp(this._getCursorPoint(evt), evt.button);
+    }
+
+    private _onMouseLeave(evt: MouseEvent): void {
+        this._behavior.onMouseLeave(this._getCursorPoint(evt), evt.button);
+    }
+
     private _onDoubleClick(evt: MouseEvent): void {
         this._behavior.onDoubleClick(this._getCursorPoint(evt));
     }
@@ -164,6 +189,10 @@ export class ChordProgressionEditor extends LitElement {
                 :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
                 preserveAspectRatio="none"
                 ${ref(this._svg)} class="edit-area"
+                @mousedown=${this._onMouseDown}
+                @mousemove=${this._onMouseMove}
+                @mouseup=${this._onMouseUp}
+                @mouseleave=${this._onMouseLeave}
                 @dblclick=${this._onDoubleClick}
                 width=${vm.totalWidth}
                 height=${vm.totalHeight}>
