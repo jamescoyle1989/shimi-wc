@@ -37,9 +37,14 @@ export class ChordProgressionEditorBehavior {
         const dragChordStart = (this._dragMode & dragModes.noteStart) > 0;
         const dragChordEnd = (this._dragMode & dragModes.noteEnd) > 0;
 
-        const newDragBeat = vm.getSnappedBeat(vm.getBeatFromXY(cartesian) - this._dragOffset);
+        let newDragBeat = vm.getSnappedBeat(vm.getBeatFromXY(cartesian) - this._dragOffset);
         if (dragChordStart) {
             if (newDragBeat < this._draggedChord.end) {
+                const minDragBeat = vm.chordProgression.chords
+                    .filter(x => x !== this._draggedChord && x !== this._draggedNeighbourChord && x.start < this._draggedChord.start)
+                    .sort((a, b) => b.end - a.end)[0]?.end ?? 0;
+                newDragBeat = Math.max(newDragBeat, minDragBeat);
+
                 const chordEnd = this._draggedChord.end;
                 this._draggedChord.start = newDragBeat;
                 this._draggedChord.end = chordEnd;
@@ -49,6 +54,11 @@ export class ChordProgressionEditorBehavior {
         }
         else if (dragChordEnd) {
             if (newDragBeat > this._draggedChord.start) {
+                const maxDragBeat = vm.chordProgression.chords
+                    .filter(x => x !== this._draggedChord && x !== this._draggedNeighbourChord && x.start > this._draggedChord.start)
+                    .sort((a, b) => a.end - b.end)[0].start ?? vm.chordProgression.end;
+                newDragBeat = Math.min(newDragBeat, maxDragBeat);
+
                 this._draggedChord.end = newDragBeat;
                 if (!!this._draggedNeighbourChord) {
                     const neighbourEnd = this._draggedNeighbourChord.end;
