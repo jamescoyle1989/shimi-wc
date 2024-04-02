@@ -5,6 +5,7 @@ import { ChordProgressionEditorViewModel } from './ChordProgressionEditorViewMod
 import { ChordFinder, ChordProgression, Scale, ChordProgressionChord, ChordProgressionPlayer } from 'shimi';
 import { ChordProgressionEditorBehavior } from './ChordProgressionEditorBehavior';
 import { ChordProgressionEditorPlayhead } from './ChordProgressionEditorPlayhead';
+import { repeat } from 'lit/directives/repeat.js';
 
 /** Contains attributes and rendering logic */
 @customElement('chord-progression-editor')
@@ -137,7 +138,7 @@ export class ChordProgressionEditor extends LitElement {
         const svg: any = this._svg.value;
         const point = this._svgPoint;
         if (!point || !svg)
-            return {x: -1, y: -1 };
+            return {x: -1, y: -1};
         point.x = evt.clientX;
         point.y = evt.clientY;
         return point.matrixTransform(svg.getScreenCTM().inverse());
@@ -244,38 +245,45 @@ export class ChordProgressionEditor extends LitElement {
         return vm.chordColor(chord, isValid);
     }
 
-    private _renderChords(): Array<TemplateResult> {
+    private _renderChords() {
         const vm = this._viewModel;
         const behavior = this._behavior;
-        const output: Array<TemplateResult> = [];
+
+        //Populate all sections for all chords into array, pass that into repeat directive to ensure that everything stays in order
+        const allSections: Array<{chord: ChordProgressionChord, section: {start: number, end: number}, hasInput: boolean}> = []
         for (const chord of vm.chordProgression?.chords ?? []) {
             const chordSections = vm.getChordLineSectionBeats(chord);
-            for (let i = 0; i < chordSections.length; i++) {
-                const chordSection = chordSections[i];
-                const chordX = vm.getXFromBeat(chordSection.start);
-                const chordY = vm.getYFromBeat(chordSection.start);
-                output.push(svg`
-                    <rect x=${chordX} y=${chordY}
-                            width=${(chordSection.end - chordSection.start) * vm.beatWidth} height=${vm.chordHeight}
-                            stroke="black" stroke-width="0.5" fill=${this._getChordColor(chord)}>
-                    </rect>
-                    <text x=${chordX + 5} y=${chordY + 60}>${vm.getChordNoteNamesLabel(chord)}</text>
-                `);
-                if (i == 0) {
-                    output.push(svg`
-                        <foreignObject x=${chordX} y=${chordY + 20}
-                                width=${Math.min(100, (chordSection.end - chordSection.start) * vm.beatWidth)}
-                                height="50">
-                            <input xmlns="http://www.w3.org/1999/xhtml"
-                                    type="text" value=${chord.chord.name}
-                                    @change=${e => behavior.onChordNameChanged(chord, e.target.value)}>
-                            </input>
-                        </foreignObject>
-                    `);
-                }
-            }
+            allSections.push(...chordSections.map((section, i) => ({chord, section, hasInput: i == 0})));
         }
-        return output;
+
+        return svg`${repeat(
+            allSections,
+            a => `${a.chord.chord.name}_${a.section.start}_${a.section.end}`,
+            a => {
+                const sectionX = vm.getXFromBeat(a.section.start);
+                const sectionY = vm.getYFromBeat(a.section.start);
+
+                return svg`
+                    <rect x=${sectionX} y=${sectionY}
+                            width=${(a.section.end - a.section.start) * vm.beatWidth} height=${vm.chordHeight}
+                            stroke="black" stroke-width="0.5" fill=${this._getChordColor(a.chord)}>
+                    </rect>
+                    <text x=${sectionX + 5} y=${sectionY + 60}>${vm.getChordNoteNamesLabel(a.chord)}</text>
+                    ${!a.hasInput ? '' :
+                        svg`
+                            <foreignObject x=${sectionX} y=${sectionY + 20}
+                                    width=${Math.min(100, (a.section.end - a.section.start) * vm.beatWidth)}
+                                    height="50">
+                                <input xmlns="http://www.w3.org/1999/xhtml"
+                                        type="text" value=${a.chord.chord.name}
+                                        @change=${e => behavior.onChordNameChanged(a.chord, e.target.value)}>
+                                </input>
+                            </foreignObject>
+                        `
+                    }
+                `
+            }
+        )}`;
     }
 
     private _renderChordGaps(): Array<TemplateResult> {
