@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Unreleased
 
 
+## 1.4.0 (2024-04-07)
+
+- Added ChordProgressionEditor component
+
+
 ## 1.3.1 (2024-01-14)
 
 ### Fixed
