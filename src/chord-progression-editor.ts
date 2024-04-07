@@ -308,7 +308,7 @@ export class ChordProgressionEditor extends LitElement {
                             width=${(a.section.end - a.section.start) * vm.beatWidth} height=${vm.chordHeight}
                             stroke="black" stroke-width="0.5" fill=${this._getChordColor(a.chord)}>
                     </rect>
-                    <text x=${sectionX + 5} y=${sectionY + 60}>${vm.getChordNoteNamesLabel(a.chord)}</text>
+                    <text x=${sectionX + 5} y=${sectionY + 60} class="chord-label">${vm.getChordNoteNamesLabel(a.chord)}</text>
                     ${!a.hasInput ? '' :
                         svg`
                             <foreignObject x=${sectionX} y=${sectionY + 20}
@@ -391,6 +391,11 @@ export class ChordProgressionEditor extends LitElement {
         .playhead {
             stroke: #F02222;
             stroke-width: 2;
+        }
+
+        .chord-label {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size: 18px;
         }
     `;
 }
