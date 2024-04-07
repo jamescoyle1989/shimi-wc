@@ -1,4 +1,4 @@
-import { ChordProgressionChord } from 'shimi';
+import { Chord, ChordProgressionChord } from 'shimi';
 import { ChordProgressionEditorViewModel } from './ChordProgressionEditorViewModel';
 import { ChordProgressionEditor } from './chord-progression-editor';
 import { dragModes } from './ClipEditorBehavior';
@@ -56,7 +56,7 @@ export class ChordProgressionEditorBehavior {
             if (newDragBeat > this._draggedChord.start) {
                 const maxDragBeat = vm.chordProgression.chords
                     .filter(x => x !== this._draggedChord && x !== this._draggedNeighbourChord && x.start > this._draggedChord.start)
-                    .sort((a, b) => a.end - b.end)[0].start ?? vm.chordProgression.end;
+                    .sort((a, b) => a.end - b.end)[0]?.start ?? vm.chordProgression.end;
                 newDragBeat = Math.min(newDragBeat, maxDragBeat);
 
                 this._draggedChord.end = newDragBeat;
@@ -103,12 +103,14 @@ export class ChordProgressionEditorBehavior {
         }
         else {
             const currentChord = vm.chordProgression.getChordAt(snappedBeat);
-            vm.chordProgression.addChord(
-                snappedBeat,
-                currentChord.end - snappedBeat,
-                currentChord.chord.duplicate()
-            );
-            currentChord.end = snappedBeat;
+            if (!!currentChord) {
+                vm.chordProgression.addChord(
+                    snappedBeat,
+                    currentChord.end - snappedBeat,
+                    currentChord.chord.duplicate()
+                );
+                currentChord.end = snappedBeat;
+            }
         }
         this._chordProgressionEditor.requestUpdate();
     }
@@ -117,14 +119,18 @@ export class ChordProgressionEditorBehavior {
     onChordNameChanged(chord: ChordProgressionChord, newName: string): void {
         const vm = this._viewModel;
 
-        if (newName == '') {
+        if (newName == '' && vm.canDeleteChord(chord)) {
             vm.chordsIncorrectlyModified.delete(chord);
             vm.chordProgression.removeChords(x => x === chord);
             this._chordProgressionEditor.requestUpdate();
             return;
         }
 
-        const newChord = vm.chordFinder.newChord(newName);
+        let newChord: Chord = null;
+        try {
+            newChord = vm.chordFinder.newChord(newName);
+        }
+        catch (err) {}
         if (!!newChord) {
             chord.chord = newChord;
             vm.chordsIncorrectlyModified.delete(chord);
@@ -156,13 +162,15 @@ export class ChordProgressionEditorBehavior {
         const grabPercent = chord.getPercent(beat);
         let neighbour: ChordProgressionChord = null;
 
-        if (grabPercent <= vm.chordResizeHandleArea) {
+        if (grabPercent <= vm.chordResizeHandleArea && vm.canEditChordStart(chord)) {
             this._dragMode = dragModes.noteStart;
-            neighbour = vm.chordProgression.chords.find(x => x.end == chord.start);
+            neighbour = vm.chordProgression.chords
+                .find(x => x.end == chord.start && vm.canEditChordEnd(x));
         }
-        else if (grabPercent >= 1 - vm.chordResizeHandleArea) {
+        else if (grabPercent >= 1 - vm.chordResizeHandleArea && vm.canEditChordEnd(chord)) {
             this._dragMode = dragModes.noteEnd;
-            neighbour = vm.chordProgression.chords.find(x => x.start == chord.end);
+            neighbour = vm.chordProgression.chords
+                .find(x => x.start == chord.end && vm.canEditChordStart(x));
         }
 
         if (this._dragMode == dragModes.none)

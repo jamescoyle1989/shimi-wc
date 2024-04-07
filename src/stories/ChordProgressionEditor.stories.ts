@@ -56,6 +56,26 @@ const meta: Meta<ChordProgressionEditor> = {
         chordColor: {
             control: 'none',
             description: 'Function that takes a ChordProgressionChord and boolean of whether it\'s valid. Returns color as string.'
+        },
+        canAddChord: {
+            control: 'none',
+            description: 'Function that takes a ChordProgressionChord, returns whether such a chord could be added to the progression.'
+        },
+        canEditChordStart: {
+            control: 'none',
+            description: 'Function that takes a ChordProgressionChord, returns whether the chord start can be altered.'
+        },
+        canEditChordEnd: {
+            control: 'none',
+            description: 'Function that takes a ChordProgressionChord, returns whether the chord end can be altered.'
+        },
+        canEditChordPitches: {
+            control: 'none',
+            description: 'Function that takes a ChordProgressionChord, returns whether the shape of the chord can be altered via updating its name.'
+        },
+        canDeleteChord: {
+            control: 'none',
+            description: 'Function that takes a ChordProgressionChord, returns whether the chord can be removed from the progression.'
         }
     }
 };
@@ -127,5 +147,49 @@ export const MultipleColors: Story = {
                 return '#88FFFF88';
             return '#8888FF88';
         }
+    }
+}
+
+export const CanDisableAddingNewChords: Story = {
+    args: {
+        chordProgression: (() => {
+            const output = oneFiveSixFour();
+            output.removeChords(x => x.start == 4);
+            return output;
+        })(),
+        xZoom: 0.5,
+        canAddChord: c => false
+    }
+}
+
+export const CanDisableEditingChordPitches: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        xZoom: 0.5,
+        canEditChordPitches: c => c.start % 8 == 0
+    }
+}
+
+export const CanDisableEditingStartOfGChord: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        xZoom: 0.5,
+        canEditChordStart: c => c.chord.name != 'G'
+    }
+}
+
+export const CanDisableEditingEndOfGChord: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        xZoom: 0.5,
+        canEditChordEnd: c => c.chord.name != 'G'
+    }
+}
+
+export const CanDisableDeletionOfChords: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        xZoom: 0.5,
+        canDeleteChord: c => false
     }
 }

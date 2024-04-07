@@ -127,6 +127,46 @@ export class ChordProgressionEditor extends LitElement {
         this.requestUpdate('chordColor', oldValue);
     }
 
+    @property({attribute: false})
+    get canAddChord(): (chord: ChordProgressionChord) => boolean { return this._viewModel.canAddChord; }
+    set canAddChord(value: (chord: ChordProgressionChord) => boolean) {
+        const oldValue = this._viewModel.canAddChord;
+        this._viewModel.canAddChord = value;
+        this.requestUpdate('canAddChord', oldValue);
+    }
+
+    @property({attribute: false})
+    get canEditChordStart(): (chord: ChordProgressionChord) => boolean { return this._viewModel.canEditChordStart; }
+    set canEditChordStart(value: (chord: ChordProgressionChord) => boolean) {
+        const oldValue = this._viewModel.canEditChordStart;
+        this._viewModel.canEditChordStart = value;
+        this.requestUpdate('canEditChordStart', oldValue);
+    }
+
+    @property({attribute: false})
+    get canEditChordEnd(): (chord: ChordProgressionChord) => boolean { return this._viewModel.canEditChordEnd; }
+    set canEditChordEnd(value: (chord: ChordProgressionChord) => boolean) {
+        const oldValue = this._viewModel.canEditChordEnd;
+        this._viewModel.canEditChordEnd = value;
+        this.requestUpdate('canEditChordEnd', oldValue);
+    }
+
+    @property({attribute: false})
+    get canEditChordPitches(): (chord: ChordProgressionChord) => boolean { return this._viewModel.canEditChordPitches; }
+    set canEditChordPitches(value: (chord: ChordProgressionChord) => boolean) {
+        const oldValue = this._viewModel.canEditChordPitches;
+        this._viewModel.canEditChordPitches = value;
+        this.requestUpdate('canEditChordPitches', oldValue);
+    }
+
+    @property({attribute: false})
+    get canDeleteChord(): (chord: ChordProgressionChord) => boolean { return this._viewModel.canDeleteChord; }
+    set canDeleteChord(value: (chord: ChordProgressionChord) => boolean) {
+        const oldValue = this._viewModel.canDeleteChord;
+        this._viewModel.canDeleteChord = value;
+        this.requestUpdate('canDeleteChord', oldValue);
+    }
+
     @state()
     private _playheadUpdateTicker: number = 0;
 
@@ -276,6 +316,7 @@ export class ChordProgressionEditor extends LitElement {
                                     height="50">
                                 <input xmlns="http://www.w3.org/1999/xhtml"
                                         type="text" value=${a.chord.chord.name}
+                                        ?disabled=${!vm.canEditChordPitches(a.chord)}
                                         @change=${e => behavior.onChordNameChanged(a.chord, e.target.value)}>
                                 </input>
                             </foreignObject>
@@ -290,7 +331,7 @@ export class ChordProgressionEditor extends LitElement {
         const vm = this._viewModel;
         const behavior = this._behavior;
         const output: Array<TemplateResult> = [];
-        for (const nonChord of vm.getChordGaps()) {
+        for (const nonChord of vm.getChordGaps().filter(x => vm.canAddChord(x))) {
             const nonChordX = vm.getXFromBeat(nonChord.start);
             const nonChordY = vm.getYFromBeat(nonChord.start);
             output.push(svg`

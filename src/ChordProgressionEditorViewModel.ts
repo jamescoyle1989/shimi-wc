@@ -33,6 +33,16 @@ export class ChordProgressionEditorViewModel {
         return valid ? '#88FF8888' : '#FF888888';
     }
 
+    canAddChord: (chord: ChordProgressionChord) => boolean = c => true;
+
+    canEditChordStart: (chord: ChordProgressionChord) => boolean = c => true;
+
+    canEditChordEnd: (chord: ChordProgressionChord) => boolean = c => true;
+
+    canEditChordPitches: (chord: ChordProgressionChord) => boolean = c => true;
+
+    canDeleteChord: (chord: ChordProgressionChord) => boolean = c => true;
+
     get beatWidth(): number { return 100 * this.xZoom; }
     set beatWidth(value: number) { this.xZoom = value / 100; }
 
