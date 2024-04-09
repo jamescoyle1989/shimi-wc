@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { ChordProgressionEditor } from '../chord-progression-editor';
 import { Chord, ChordFinder, ChordProgression, ChordProgressionPlayer, Clock, Metronome, MidiBus, ScaleTemplate } from 'shimi';
+import { DefaultChordProgressionEditorFullWidthStrategy, WrapChordProgressionEditorFullWidthStrategy } from '../ChordProgressionEditorFullWidthStrategies';
 
 
 const meta: Meta<ChordProgressionEditor> = {
@@ -191,5 +192,19 @@ export const CanDisableDeletionOfChords: Story = {
         chordProgression: oneFiveSixFour(),
         xZoom: 0.5,
         canDeleteChord: c => false
+    }
+}
+
+export const FullWidth: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        fullWidthStrategy: new DefaultChordProgressionEditorFullWidthStrategy()
+    }
+}
+
+export const FullWidthWithWrap: Story = {
+    args: {
+        chordProgression: oneFiveSixFour(),
+        fullWidthStrategy: new WrapChordProgressionEditorFullWidthStrategy(100)
     }
 }

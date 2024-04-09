@@ -6,6 +6,7 @@ import { ChordFinder, ChordProgression, Scale, ChordProgressionChord, ChordProgr
 import { ChordProgressionEditorBehavior } from './ChordProgressionEditorBehavior';
 import { ChordProgressionEditorPlayhead } from './ChordProgressionEditorPlayhead';
 import { repeat } from 'lit/directives/repeat.js';
+import { FullWidthStrategy } from './FullWidthStrategy';
 
 /** Contains attributes and rendering logic */
 @customElement('chord-progression-editor')
@@ -67,6 +68,23 @@ export class ChordProgressionEditor extends LitElement {
         this._viewModel.totalHeight = value;
         this.requestUpdate('height', oldValue);
     }
+
+    @property({attribute: false})
+    get fullWidthStrategy(): FullWidthStrategy<ChordProgressionEditorViewModel> { return this._fullWidthStrategy; }
+    set fullWidthStrategy(value: FullWidthStrategy<ChordProgressionEditorViewModel>) {
+        const oldValue = this._fullWidthStrategy;
+        this._fullWidthStrategy = value;
+        if (!!oldValue)
+            oldValue.destroy();
+        if (!!value) {
+            value.viewModel = this._viewModel;
+            value.callback = () => this.requestUpdate();
+            if (!!this._container.value)
+                value.observe(this._container.value);
+        }
+        this.requestUpdate('fullWidthStrategy', oldValue);
+    }
+    private _fullWidthStrategy: FullWidthStrategy<ChordProgressionEditorViewModel> = null;
 
     @property({attribute: 'beats-per-bar', type: Number, reflect: true})
     get beatsPerBar(): number { return this._viewModel.beatsPerBar; }
@@ -174,6 +192,8 @@ export class ChordProgressionEditor extends LitElement {
 
     private _svgPoint: SVGPoint | null = null;
 
+    private _container: Ref<HTMLElement> = createRef();
+
     private _getCursorPoint(evt: MouseEvent): {x: number, y: number} {
         const svg: any = this._svg.value;
         const point = this._svgPoint;
@@ -221,29 +241,35 @@ export class ChordProgressionEditor extends LitElement {
     firstUpdated() {
         const svg: any = this._svg.value;
         this._svgPoint = svg.createSVGPoint();
+        if (!!this._fullWidthStrategy)
+            this._fullWidthStrategy.observe(this._container.value);
     }
 
     render() {
         const vm = this._viewModel;
         return html`
-            <svg xmlns="http://www.w3.org/2000/svg"
-                :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
-                preserveAspectRatio="none"
-                ${ref(this._svg)} class="edit-area"
-                @mousedown=${this._onMouseDown}
-                @mousemove=${this._onMouseMove}
-                @mouseup=${this._onMouseUp}
-                @mouseleave=${this._onMouseLeave}
-                @dblclick=${this._onDoubleClick}
-                width=${vm.totalWidth}
-                height=${vm.totalHeight}>
+            <div class=${!!this._fullWidthStrategy ? 'full-width-container' : ''}
+                ${ref(this._container)}>
 
-                ${this._renderRows()}
-                ${this._renderBeatLines()}
-                ${this._renderChords()}
-                ${this._renderChordGaps()}
-                ${this._renderPlayheads()}
-            </svg>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    :viewBox="0 0 ${vm.totalWidth} ${vm.totalHeight}"
+                    preserveAspectRatio="none"
+                    ${ref(this._svg)} class="edit-area"
+                    @mousedown=${this._onMouseDown}
+                    @mousemove=${this._onMouseMove}
+                    @mouseup=${this._onMouseUp}
+                    @mouseleave=${this._onMouseLeave}
+                    @dblclick=${this._onDoubleClick}
+                    width=${vm.totalWidth}
+                    height=${vm.totalHeight}>
+
+                    ${this._renderRows()}
+                    ${this._renderBeatLines()}
+                    ${this._renderChords()}
+                    ${this._renderChordGaps()}
+                    ${this._renderPlayheads()}
+                </svg>
+            </div>
         `;
     }
 
@@ -362,6 +388,11 @@ export class ChordProgressionEditor extends LitElement {
     }
 
     static styles = css`
+        .full-width-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
         .edit-area {
             user-select: none;
             -webkit-user-select: none;
