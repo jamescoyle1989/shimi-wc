@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Unreleased
 
 
+## 1.5.0 (2024-04-09)
+
+- Added support for ClipEditor & ChordProgression editor to set their own full-width strategies
+
+
 ## 1.4.1 (2024-04-08)
 
 - Fix to include ChordProgressionEditor in list of library exports
