@@ -7,6 +7,7 @@ import { ChordProgressionEditorBehavior } from './ChordProgressionEditorBehavior
 import { ChordProgressionEditorPlayhead } from './ChordProgressionEditorPlayhead';
 import { repeat } from 'lit/directives/repeat.js';
 import { FullWidthStrategy } from './FullWidthStrategy';
+import { getFullWidthStrategyByName } from './ChordProgressionEditorFullWidthStrategies';
 
 /** Contains attributes and rendering logic */
 @customElement('chord-progression-editor')
@@ -68,6 +69,10 @@ export class ChordProgressionEditor extends LitElement {
         this._viewModel.totalHeight = value;
         this.requestUpdate('height', oldValue);
     }
+
+    @property({attribute: 'full-width-strategy', type: String, reflect: true})
+    get fullWidthStrategyName(): string { return this._fullWidthStrategy?.name ?? 'none'; }
+    set fullWidthStrategyName(value: string) { this.fullWidthStrategy = getFullWidthStrategyByName(value); }
 
     @property({attribute: false})
     get fullWidthStrategy(): FullWidthStrategy<ChordProgressionEditorViewModel> { return this._fullWidthStrategy; }

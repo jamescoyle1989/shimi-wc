@@ -299,6 +299,6 @@ export const FullWidth: Story = {
         minPitch: 60,
         maxPitch: 72,
         canDeleteNote: n => false,
-        fullWidthStrategy: new DefaultClipEditorFullWidthStrategy()
+        fullWidthStrategyName: 'default'
     }
 }

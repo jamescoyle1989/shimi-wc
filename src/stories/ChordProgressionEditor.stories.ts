@@ -198,13 +198,13 @@ export const CanDisableDeletionOfChords: Story = {
 export const FullWidth: Story = {
     args: {
         chordProgression: oneFiveSixFour(),
-        fullWidthStrategy: new DefaultChordProgressionEditorFullWidthStrategy()
+        fullWidthStrategyName: 'default'
     }
 }
 
 export const FullWidthWithWrap: Story = {
     args: {
         chordProgression: oneFiveSixFour(),
-        fullWidthStrategy: new WrapChordProgressionEditorFullWidthStrategy(100)
+        fullWidthStrategyName: 'wrap'
     }
 }

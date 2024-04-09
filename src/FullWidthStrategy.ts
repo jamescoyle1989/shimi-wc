@@ -9,8 +9,11 @@ export abstract class FullWidthStrategy<T_VM> {
     private _callback: () => void;
     get callback(): () => void { return this._callback; }
     set callback(value: () => void) { this._callback = value; }
+
+    private _name: string = 'none';
+    get name(): string { return this._name; }
     
-    constructor() {
+    constructor(name: string) {
         const myself = this;
         this._resizeObserver = new ResizeObserver(myself._onResize);
     }

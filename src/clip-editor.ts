@@ -7,6 +7,7 @@ import { ClipEditorViewModel } from './ClipEditorViewModel';
 import { ClipEditorBehavior } from './ClipEditorBehavior';
 import { ClipEditorPlayhead } from './ClipEditorPlayhead';
 import { FullWidthStrategy } from './FullWidthStrategy';
+import { getFullWidthStrategyByName } from './ClipEditorFullWidthStrategies';
 
 /** Contains attributes and rendering logic */
 @customElement('clip-editor')
@@ -60,6 +61,10 @@ export class ClipEditor extends LitElement {
         this._viewModel.totalHeight = value;
         this.requestUpdate('height', oldValue);
     }
+
+    @property({attribute: 'full-width-strategy', type: String, reflect: true})
+    get fullWidthStrategyName(): string { return this._fullWidthStrategy?.name ?? 'none'; }
+    set fullWidthStrategyName(value: string) { this.fullWidthStrategy = getFullWidthStrategyByName(value); }
 
     @property({attribute: false})
     get fullWidthStrategy(): FullWidthStrategy<ClipEditorViewModel> { return this._fullWidthStrategy; }
