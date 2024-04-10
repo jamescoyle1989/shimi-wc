@@ -15,7 +15,9 @@ export abstract class FullWidthStrategy<T_VM> {
     
     constructor(name: string) {
         const myself = this;
-        this._resizeObserver = new ResizeObserver(myself._onResize);
+        //Do this check to allow for tests to pass
+        if (typeof ResizeObserver !== 'undefined')
+            this._resizeObserver = new ResizeObserver(myself._onResize);
     }
 
     observe(element: any): void {

@@ -2,19 +2,33 @@ import { ClipEditorViewModel } from "./ClipEditorViewModel";
 import { FullWidthStrategy } from "./FullWidthStrategy";
 
 export function getFullWidthStrategyByName(name: string) {
-    switch (name) {
-        case 'default':
-            return new DefaultClipEditorFullWidthStrategy();
-        case 'bounded':
-            return new BoundedClipEditorFullWidthStrategy(20, 150);
-        default:
-            throw Error(`'${name}' is not a valid full-width strategy.`);
+    if (name == 'stretch')
+        return new StretchClipEditorFullWidthStrategy();
+
+    if (name.startsWith('boundedstretch-')) {
+        const split = name.split('-');
+        if (split.length == 3)
+            return new BoundedStretchClipEditorFullWidthStrategy(Number(split[1]), Number(split[2]));
     }
+
+    if (name == 'linearscale')
+        return new LinearScaleClipEditorFullWidthStrategy(1, 0);
+    if (name.startsWith('linearscale-')) {
+        const split = name.split('-');
+        if (split.length == 2)
+            return new LinearScaleClipEditorFullWidthStrategy(Number(split[1]), 0);
+        if (split.length == 3)
+            return new LinearScaleClipEditorFullWidthStrategy(Number(split[1]), Number(split[2]));
+    }
+
+    throw Error(`'${name}' is not a valid full-width strategy.`);
 }
 
-export class DefaultClipEditorFullWidthStrategy extends FullWidthStrategy<ClipEditorViewModel> {
+
+
+export class StretchClipEditorFullWidthStrategy extends FullWidthStrategy<ClipEditorViewModel> {
     constructor() {
-        super('default');
+        super('stretch');
     }
     
     resize(entry: ResizeObserverEntry): void {
@@ -22,18 +36,34 @@ export class DefaultClipEditorFullWidthStrategy extends FullWidthStrategy<ClipEd
     }
 }
 
-export class BoundedClipEditorFullWidthStrategy extends FullWidthStrategy<ClipEditorViewModel> {
-    private _minBeatWidth: number;
-    private _maxBeatWidth: number;
+export class BoundedStretchClipEditorFullWidthStrategy extends FullWidthStrategy<ClipEditorViewModel> {
+    minBeatWidth: number;
+    maxBeatWidth: number;
     
     constructor(minBeatWidth: number, maxBeatWidth: number) {
-        super('bounded');
-        this._minBeatWidth = minBeatWidth;
-        this._maxBeatWidth = maxBeatWidth;
+        super('boundedstretch');
+        this.minBeatWidth = minBeatWidth;
+        this.maxBeatWidth = maxBeatWidth;
     }
     
     resize(entry: ResizeObserverEntry): void {
         this.viewModel.totalWidth = entry.contentRect.width;
-        this.viewModel.beatWidth = Math.min(Math.max(this._minBeatWidth, this.viewModel.beatWidth), this._maxBeatWidth);
+        this.viewModel.beatWidth = Math.min(Math.max(this.minBeatWidth, this.viewModel.beatWidth), this.maxBeatWidth);
+    }
+}
+
+export class LinearScaleClipEditorFullWidthStrategy extends FullWidthStrategy<ClipEditorViewModel> {
+    yScaleM: number;
+    yScaleC: number;
+
+    constructor(yScaleM: number, yScaleC: number) {
+        super('linearscale');
+        this.yScaleM = yScaleM;
+        this.yScaleC = yScaleC;
+    }
+
+    resize(entry: ResizeObserverEntry): void {
+        this.viewModel.totalWidth = entry.contentRect.width;
+        this.viewModel.yZoom = (this.viewModel.xZoom * this.yScaleM) + this.yScaleC;
     }
 }

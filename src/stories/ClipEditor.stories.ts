@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { ClipEditor } from '../clip-editor';
 import { Clip, ClipPlayer, Clock, Metronome, MidiBus, ScaleTemplate } from 'shimi';
-import { DefaultClipEditorFullWidthStrategy } from '../ClipEditorFullWidthStrategies';
 
 
 const meta: Meta<ClipEditor> = {
@@ -299,6 +298,6 @@ export const FullWidth: Story = {
         minPitch: 60,
         maxPitch: 72,
         canDeleteNote: n => false,
-        fullWidthStrategyName: 'default'
+        fullWidthStrategyName: 'stretch'
     }
 }
