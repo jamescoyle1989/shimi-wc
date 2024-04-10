@@ -8,19 +8,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## Unreleased
 
 
+## 1.5.1 (2024-04-09)
+
+### Fixed
+
+- Prevented ChordProgressionEditor from throwing error if chordProgression property not set
+
+
 ## 1.5.0 (2024-04-09)
 
-- Added support for ClipEditor & ChordProgression editor to set their own full-width strategies
+### Added
+
+- Support for ClipEditor & ChordProgression editor to set their own full-width strategies
 
 
 ## 1.4.1 (2024-04-08)
 
-- Fix to include ChordProgressionEditor in list of library exports
+### Fixed
+
+- Included ChordProgressionEditor in list of library exports
 
 
 ## 1.4.0 (2024-04-07)
 
-- Added ChordProgressionEditor component
+### Added
+
+- ChordProgressionEditor component
 
 
 ## 1.3.1 (2024-01-14)
