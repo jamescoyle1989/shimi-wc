@@ -208,3 +208,8 @@ export const FullWidthWithWrap: Story = {
         fullWidthStrategyName: 'wrap'
     }
 }
+
+export const DoesntRenderIfChordProgressionNotSet: Story = {
+    args: {
+    }
+}

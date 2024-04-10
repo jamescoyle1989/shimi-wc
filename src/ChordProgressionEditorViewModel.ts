@@ -168,6 +168,8 @@ export class ChordProgressionEditorViewModel {
     chordsIncorrectlyModified = new Set<ChordProgressionChord>();
 
     getChordGaps(): Array<ChordProgressionChord> {
+        if (!this.chordProgression)
+            return [];
         const orderedChords = this.chordProgression.chords.sort((a, b) => a.start - b.start);
         const output = new Array<ChordProgressionChord>();
         if (orderedChords.length == 0) {
