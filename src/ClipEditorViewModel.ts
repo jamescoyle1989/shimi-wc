@@ -220,10 +220,12 @@ export class ClipEditorViewModel {
         '#ffeb3b',
         '#ffc107',
         '#ff9800',
-        '#ff5722'
+        '#ff5722',
+        '#309cb4'
     ];
     private _defaultNoteColor(note: ClipNote, isSelected: boolean): string {
-        let chromaObj = chroma(this._defaultNoteColors[note.channel % 16]);
+        
+        let chromaObj = chroma(this._defaultNoteColors[note.channel + 1 % 17]);
         if (isSelected)
             chromaObj = chromaObj.brighten(0.4);
         if (typeof note.velocity === 'number')

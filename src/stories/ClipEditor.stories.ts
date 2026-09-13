@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { ClipEditor } from '../clip-editor';
-import { Clip, ClipPlayer, Clock, Metronome, MidiBus, ScaleTemplate } from 'shimi';
+import { Clip, ClipPlayer, Clock, Metronome, MidiBus, ScaleTemplate, TimeSig } from 'shimi';
 
 
 const meta: Meta<ClipEditor> = {
@@ -214,10 +214,10 @@ export const CustomPitchNaming: Story = {
         minPitch: 24,
         maxPitch: 35,
         customPitchNames: new Map<number, string>()
-            .set(24, 'A').set(25, 'B').set(26, 'C')
-            .set(27, 'D').set(28, 'E').set(29, 'F')
-            .set(30, 'G').set(31, 'H').set(32, 'I')
-            .set(33, 'J').set(34, 'K').set(35, 'L')
+            .set(60, 'A').set(61, 'B').set(62, 'C')
+            .set(63, 'D').set(64, 'E').set(65, 'F')
+            .set(66, 'G').set(67, 'H').set(68, 'I')
+            .set(69, 'J').set(70, 'K').set(71, 'L')
     }
 };
 
@@ -283,7 +283,7 @@ export const Playhead: Story = {
     play: async({ canvasElement }) => {
         const editor = canvasElement.children.item(0) as ClipEditor;
         const clock = new Clock();
-        const metronome = clock.addChild(new Metronome(120)) as Metronome;
+        const metronome = clock.addChild(new Metronome(120, TimeSig.commonTime())) as Metronome;
         const midiOut = new MidiBus();
         const clipPlayer = clock.addChild(new ClipPlayer(editor.clip, metronome, midiOut)) as ClipPlayer;
         clipPlayer.beatCount = editor.clip.duration;
