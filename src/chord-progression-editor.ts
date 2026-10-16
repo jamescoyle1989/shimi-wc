@@ -435,3 +435,9 @@ export class ChordProgressionEditor extends LitElement {
         }
     `;
 }
+
+declare global {
+    interface HTMLElementTagNameMap {
+        'chord-progression-editor': ChordProgressionEditor
+    }
+}

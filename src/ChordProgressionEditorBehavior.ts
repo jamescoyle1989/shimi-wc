@@ -96,18 +96,23 @@ export class ChordProgressionEditorBehavior {
                 .filter(x => x.start < snappedBeat)
                 .sort((a, b) => b.start - a.start)
                 .find(x => true);
-            if (!!previousChord) {
+            if (!!previousChord && this._viewModel.canEditChordEnd(previousChord) && this._viewModel.canDeleteChord(chordAtBeat)) {
                 vm.chordProgression.removeChords(x => x === chordAtBeat);
                 previousChord.end = chordAtBeat.end;
             }
         }
         else {
             const currentChord = vm.chordProgression.getChordAt(snappedBeat);
-            if (!!currentChord) {
+            const newChord = new ChordProgressionChord(
+                snappedBeat,
+                currentChord.end - snappedBeat,
+                currentChord.chord.duplicate()
+            );
+            if (!!currentChord && this._viewModel.canEditChordEnd(currentChord) && this._viewModel.canAddChord(newChord)) {
                 vm.chordProgression.addChord(
-                    snappedBeat,
-                    currentChord.end - snappedBeat,
-                    currentChord.chord.duplicate()
+                    newChord.start,
+                    newChord.duration,
+                    newChord.chord
                 );
                 currentChord.end = snappedBeat;
             }

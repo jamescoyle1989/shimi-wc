@@ -25,10 +25,10 @@ Chord.nameGenerator = chord => {
 
 function oneFiveSixFour(): ChordProgression {
     const output = new ChordProgression(16)
-        .addChord(0, 4, chordFinder.newChord('C'))
-        .addChord(4, 4, chordFinder.newChord('G'))
-        .addChord(8, 4, chordFinder.newChord('Am'))
-        .addChord(12, 4, chordFinder.newChord('F'));
+        .addChord(0, 4, chordFinder.newChord('C')!)
+        .addChord(4, 4, chordFinder.newChord('G')!)
+        .addChord(8, 4, chordFinder.newChord('Am')!)
+        .addChord(12, 4, chordFinder.newChord('F')!);
     return output;
 }
 
@@ -59,4 +59,81 @@ test('Can start drag on the end of a chord on the 2nd line', () => {
     expect(behavior['_dragMode']).toBe(dragModes.noteEnd);
     expect(behavior['_draggedChord']).toBe(vm.chordProgression.getChordAt(10));
     expect(behavior['_draggedNeighbourChord']).toBe(vm.chordProgression.getChordAt(14));
+});
+
+test(`Can't double click to join 2 chords into one without canEditChordEnd permission`, () => {
+    const [behavior, vm, editor] = getDefaultTestSetup();
+    vm.canEditChordEnd = c => false;
+    const clickBeat = 12;
+    const clickX = vm.getXFromBeat(clickBeat);
+    const clickY = vm.getYFromBeat(clickBeat);
+
+    behavior.onDoubleClick({x: clickX, y: clickY});
+
+    expect(vm.chordProgression.chords).toHaveLength(4);
+});
+
+test(`Can't double click to join 2 chords into one without canDeleteChord permission`, () => {
+    const [behavior, vm, editor] = getDefaultTestSetup();
+    vm.canDeleteChord = c => false;
+    const clickBeat = 12;
+    const clickX = vm.getXFromBeat(clickBeat);
+    const clickY = vm.getYFromBeat(clickBeat);
+
+    behavior.onDoubleClick({x: clickX, y: clickY});
+
+    expect(vm.chordProgression.chords).toHaveLength(4);
+});
+
+test(`Can double click to join 2 chords into one with canDeleteChord & canEditChordEnd permissions`, () => {
+    const [behavior, vm, editor] = getDefaultTestSetup();
+    vm.canDeleteChord = c => true;
+    vm.canEditChordEnd = c => true;
+    const clickBeat = 12;
+    const clickX = vm.getXFromBeat(clickBeat);
+    const clickY = vm.getYFromBeat(clickBeat);
+
+    behavior.onDoubleClick({x: clickX, y: clickY});
+
+    expect(vm.chordProgression.chords).toHaveLength(3);
+    expect(vm.chordProgression.chords[2].duration).toBe(8);
+});
+
+test(`Can't double click to split a chord in 2 without canEditChordEnd permission`, () => {
+    const [behavior, vm, editor] = getDefaultTestSetup();
+    vm.canEditChordEnd = c => false;
+    const clickBeat = 13;
+    const clickX = vm.getXFromBeat(clickBeat);
+    const clickY = vm.getYFromBeat(clickBeat);
+
+    behavior.onDoubleClick({x: clickX, y: clickY});
+
+    expect(vm.chordProgression.chords).toHaveLength(4);
+});
+
+test(`Can't double click to split a chord in 2 without canAddChord permission`, () => {
+    const [behavior, vm, editor] = getDefaultTestSetup();
+    vm.canAddChord = c => false;
+    const clickBeat = 13;
+    const clickX = vm.getXFromBeat(clickBeat);
+    const clickY = vm.getYFromBeat(clickBeat);
+
+    behavior.onDoubleClick({x: clickX, y: clickY});
+
+    expect(vm.chordProgression.chords).toHaveLength(4);
+});
+
+test(`Can double click to split a chord in 2 with canAddChord & canEditChordEnd permissions`, () => {
+    const [behavior, vm, editor] = getDefaultTestSetup();
+    vm.canAddChord = c => true;
+    vm.canEditChordEnd = c => true;
+    const clickBeat = 13;
+    const clickX = vm.getXFromBeat(clickBeat);
+    const clickY = vm.getYFromBeat(clickBeat);
+
+    behavior.onDoubleClick({x: clickX, y: clickY});
+
+    expect(vm.chordProgression.chords).toHaveLength(5);
+    expect(vm.chordProgression.chords[3].duration).toBe(1);
+    expect(vm.chordProgression.chords[4].duration).toBe(3);
 });
