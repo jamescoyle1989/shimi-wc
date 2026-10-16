@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+
+## 2.0.0 (2026-10-15)
+
 ### Changed
 
 - **Breaking:** shimi is now a peer dependency, and must be installed alongside shimi-wc. Lit, shimi & chroma-js are no longer bundled into the npm build, so apps share a single copy of each with the components
