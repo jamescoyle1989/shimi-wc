@@ -3,16 +3,35 @@
   "version": "1.6.0",
   "description": "A collection of web components for building complex MIDI applications",
   "type": "module",
-  "main": "dist/index.mjs",
-  "unpkg": "dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "unpkg": "./dist/shimi-wc.iife.js",
+  "jsdelivr": "./dist/shimi-wc.iife.js",
+  "customElements": "dist/custom-elements.json",
+  "sideEffects": true,
+  "homepage": "https://jamescoyle1989.github.io/shimi-wc/",
+  "bugs": {
+    "url": "https://github.com/jamescoyle1989/shimi-wc/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jamescoyle1989/shimi-wc.git"
+    "url": "git+https://github.com/jamescoyle1989/shimi-wc.git"
   },
   "keywords": [
     "midi",
     "music",
-    "webcomponents"
+    "webcomponents",
+    "web-components",
+    "lit",
+    "browser"
   ],
   "author": "James Coyle",
   "license": "MIT",
@@ -21,28 +40,35 @@
   ],
   "scripts": {
     "test": "vitest",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && vite build --mode cdn && cem analyze --litelement --globs \"src/*.ts\" --outdir dist",
+    "lint:package": "publint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o ./docs && node setDocsNoJekyll.js",
-    "publish": "tsc && vite build && npm publish"
+    "build-storybook": "storybook build",
+    "prepublishOnly": "vitest run && npm run build && publint"
+  },
+  "peerDependencies": {
+    "shimi": "^4.0.1"
   },
   "dependencies": {
     "chroma-js": "^2.4.2",
-    "lit": "^3.1.1",
-    "shimi": "^4.0.0"
+    "lit": "^3.1.1"
   },
   "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
     "@storybook/addon-essentials": "^7.6.8",
     "@storybook/addon-links": "^7.6.8",
     "@storybook/blocks": "^7.6.8",
     "@storybook/web-components": "^7.6.8",
     "@storybook/web-components-vite": "^7.6.8",
     "@types/chroma-js": "^2.4.0",
+    "publint": "^0.3.25",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "shimi": "^4.0.1",
     "storybook": "^7.6.15",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
+    "vite-plugin-dts": "^3.9.1",
     "vitest": "^0.34.6"
   }
 }

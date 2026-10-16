@@ -18,12 +18,38 @@ The library currently only contains a few components...
 
 - **&lt;scale-picker&gt;** - Allows users to select the type of scale they want, then the specific root they'd like that scale to have, returning an event with the requested scale object.
 
+- **&lt;chord-progression-editor&gt;** - Draws the chords from a chord progression object, allowing the user to manipulate the chords within the progression.
 
-## Example
 
-Here is a simple example, displaying a clip editor that allows editing of the first 2 bars of 'twinkle twinkle':
+## Install
+
+Shimi-wc works with objects from [Shimi](https://github.com/jamescoyle1989/shimi), which needs to be installed alongside it:
 
 ```
+$ npm install shimi shimi-wc
+```
+
+Importing shimi-wc registers all of its custom elements:
+
+```js
+import { Clip } from 'shimi';
+import 'shimi-wc';
+
+document.querySelector('clip-editor').clip = new Clip(8);
+```
+
+The package also exports the component classes and full width strategies, along with TypeScript types:
+
+```ts
+import { ClipEditor, StretchClipEditorFullWidthStrategy } from 'shimi-wc';
+```
+
+
+## Using from a script tag
+
+Shimi-wc can also be loaded from a CDN with no build step. Load shimi first, since shimi-wc uses the global `shimi` object that it creates. Here is a simple example, displaying a clip editor that allows editing of the first 2 bars of 'twinkle twinkle':
+
+```html
 <script src="https://unpkg.com/shimi"></script>
 <script src="https://unpkg.com/shimi-wc"></script>
 
@@ -39,17 +65,7 @@ clipEditor.clip = new shimi.Clip(8)
 </script>
 ```
 
-
-## Install
-```
-$ npm install shimi-wc
-```
-
-or
-
-```
-<script src="https://unpkg.com/shimi-wc"></script>
-```
+The script also creates a global `shimiWc` object, holding the same exports as the npm package.
 
 
 ## Documentation

@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Built storybook site (deployed to GitHub Pages by CI)
+storybook-static
+docs

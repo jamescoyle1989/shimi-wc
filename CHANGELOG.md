@@ -7,6 +7,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+### Changed
+
+- **Breaking:** shimi is now a peer dependency, and must be installed alongside shimi-wc. Lit, shimi & chroma-js are no longer bundled into the npm build, so apps share a single copy of each with the components
+- **Breaking:** The package is now ESM only. The CommonJS build has been removed, and the ES module has moved from `dist/index.mjs` to `dist/index.js`. Imports should go through the package name (`import 'shimi-wc'`) rather than file paths
+- The unpkg/jsdelivr build is now a script that works from a plain `<script>` tag, using the global `shimi` object
+
+### Added
+
+- TypeScript type declarations
+- Component classes & full width strategies are now exported from the package (previous releases exported nothing)
+- `HTMLElementTagNameMap` entry for `<chord-progression-editor>`
+- Custom elements manifest (`dist/custom-elements.json`) for editor tooling
+
+### Fixed
+
+- `<script>` tag usage from unpkg, which previously failed because the file it served was an ES module
+
+
+## 1.6.0 (2026-09-13)
+
+### Changed
+
+- Updated shimi dependency to v4
+
 
 ## 1.5.3 (2024-04-10)
 

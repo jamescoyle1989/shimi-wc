@@ -1,0 +1,35 @@
+# Publishes to npm when a version tag (e.g. v1.7.0) is pushed
+#
+# Uses npm trusted publishing, so no npm token is stored in the repo. One-off setup on npmjs.com:
+# shimi-wc > Settings > Trusted Publisher > GitHub Actions, with workflow filename 'publish.yml'
+name: Publish to npm
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # Trusted publishing requires npm 11.5.1 or later
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - name: Check tag matches package version
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$PKG_VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+      - run: npm ci
+      # prepublishOnly runs the tests, build & package lint
+      - run: npm publish --provenance --access public
